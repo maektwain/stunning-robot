@@ -16,11 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import javax.inject.Inject;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service class for managing users.
@@ -86,19 +87,40 @@ public class UserService {
             });
     }
 
-    public User createUserInformation(String login, String password, String firstName, String lastName, String email,
+    public User createUserInformation(String login, String password, String firstName, String lastName, String email,String mobile,
         String langKey) {
 
         User newUser = new User();
         Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         Set<Authority> authorities = new HashSet<>();
+
+        if (password == null){
+
+            password = mobile;
+        }
+
         String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(login);
+
+        if (login == null){
+
+            login = mobile;
+
+            newUser.setLogin(login);
+
+        }else {
+
+            newUser.setLogin(login);
+        }
+
+
+
+
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setEmail(email);
+        newUser.setMobile(mobile);
         newUser.setLangKey(langKey);
         // new user is not active
         newUser.setActivated(false);

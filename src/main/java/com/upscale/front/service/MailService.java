@@ -30,7 +30,7 @@ import java.util.Locale;
 public class MailService {
 
     private final Logger log = LoggerFactory.getLogger(MailService.class);
-    
+
     private static final String USER = "user";
     private static final String BASE_URL = "baseUrl";
 
@@ -78,6 +78,9 @@ public class MailService {
         sendEmail(user.getEmail(), subject, content, false, true);
     }
 
+
+
+
     @Async
     public void sendCreationEmail(User user, String baseUrl) {
         log.debug("Sending creation e-mail to '{}'", user.getEmail());
@@ -101,5 +104,5 @@ public class MailService {
         String subject = messageSource.getMessage("email.reset.title", null, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
     }
-    
+
 }

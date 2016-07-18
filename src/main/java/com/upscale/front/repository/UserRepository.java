@@ -1,10 +1,9 @@
 package com.upscale.front.repository;
 
 import com.upscale.front.domain.User;
-
-import java.time.ZonedDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findOneByLogin(String login);
 
     Optional<User> findOneById(Long userId);
+
+    Optional<User> findOneByMobile(String mobile);
 
     @Override
     void delete(User t);

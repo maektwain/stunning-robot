@@ -1,17 +1,17 @@
 package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.MailService;
+import com.upscale.front.service.SMSService;
 import com.upscale.front.service.UserService;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
-
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.*;
+import java.util.Optional;
 
 /**
  * REST controller for managing the current user's account.
@@ -45,6 +43,9 @@ public class AccountResource {
 
     @Inject
     private MailService mailService;
+
+    @Inject
+    private SMSService smsService;
 
     /**
      * POST  /register : register the user.
@@ -68,7 +69,7 @@ public class AccountResource {
                 .map(user -> new ResponseEntity<>("e-mail address already in use", textPlainHeaders, HttpStatus.BAD_REQUEST))
                 .orElseGet(() -> {
                     User user = userService.createUserInformation(managedUserDTO.getLogin(), managedUserDTO.getPassword(),
-                    managedUserDTO.getFirstName(), managedUserDTO.getLastName(), managedUserDTO.getEmail().toLowerCase(),
+                    managedUserDTO.getFirstName(), managedUserDTO.getLastName(), managedUserDTO.getEmail().toLowerCase(),managedUserDTO.getMobile(),
                     managedUserDTO.getLangKey());
                     String baseUrl = request.getScheme() + // "http"
                     "://" +                                // "://"
@@ -83,6 +84,35 @@ public class AccountResource {
         );
     }
 
+    /**
+     * POST /mobileRegister : register through mobile.
+     *
+     * @param managedUserDTO the managed user DTO
+     * @param request the HTTP request
+     * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the login or mobile is already in use
+     *
+     */
+
+    @RequestMapping(value = "/mobileRegister",
+                    method = RequestMethod.POST,
+                    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @Timed
+    public ResponseEntity<?> mobileRegister(@Valid @RequestBody ManagedUserDTO managedUserDTO, HttpServletRequest request){
+        HttpHeaders textHttpHeaders = new HttpHeaders();
+
+        textHttpHeaders.setContentType(MediaType.TEXT_PLAIN);
+
+        return userRepository.findOneByMobile(managedUserDTO.getMobile())
+            .map(user -> new ResponseEntity<>( "Mobile Already In Use", textHttpHeaders, HttpStatus.BAD_REQUEST))
+            .orElseGet(() -> {
+                User user = userService.createUserInformation(managedUserDTO.getLogin(),managedUserDTO.getPassword(),managedUserDTO.getFirstName(),
+                    managedUserDTO.getLastName(),managedUserDTO.getEmail(),managedUserDTO.getMobile(),
+                    managedUserDTO.getLangKey());
+                //Implement SMS Service
+                smsService.SendSmS(user.getMobile(), RandomStringUtils.random(4));
+                return  new ResponseEntity<>(HttpStatus.CREATED);
+            });
+    }
     /**
      * GET  /activate : activate the registered user.
      *

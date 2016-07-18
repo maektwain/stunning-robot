@@ -33,15 +33,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotNull
+
     @Pattern(regexp = Constants.LOGIN_REGEX)
     @Size(min = 1, max = 50)
     @Column(length = 50, unique = true, nullable = false)
     private String login;
 
     @JsonIgnore
-    @NotNull
-    @Size(min = 60, max = 60) 
+    @Size(min = 60, max = 60)
     @Column(name = "password_hash",length = 60)
     private String password;
 
@@ -57,6 +56,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Size(max = 100)
     @Column(length = 100, unique = true)
     private String email;
+
+    @Size(max = 10)
+    @Column(name = "mobile", length = 10)
+    private String mobile;
 
     @NotNull
     @Column(nullable = false)
@@ -115,6 +118,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public String getFirstName() {
         return firstName;
     }
+
+    public String getMobile() {return mobile; }
+
+    public void setMobile(String mobile){this.mobile = mobile;}
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -214,6 +221,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
+            ", mobile='" + mobile + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +
