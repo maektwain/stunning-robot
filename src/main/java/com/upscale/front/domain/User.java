@@ -84,16 +84,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "request_id", nullable = true)
     private String requestId;
 
-    @NotNull
-    @Column(name = "is_selfService", nullable = false)
-    private boolean isSelfService;
-
-    @Column(name = "client_id", nullable = true)
-    private String clientId;
-    
-    @Column(name = "selfUser_id", nullable = true)
-    private String selfUserId;
-    
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -103,6 +93,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Authority> authorities = new HashSet<>();
 
+    @Column(name = "client_id", nullable = true)
+    private Long clientId;
+
+    @Column(name = "self_service_id", nullable = false)
+    private Long selfServiceId;
+
+
+
     public Long getId() {
         return id;
     }
@@ -110,6 +108,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Long getClientId() {return clientId; }
+
+    public void setClientId(Long id) {this.clientId = id;}
+
+    public Long getSelfServiceId() {return selfServiceId; }
+
+    public void setSelfServiceId(Long id) { this.selfServiceId = id;}
 
     public String getLogin() {
         return login;
@@ -199,30 +205,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public void setLangKey(String langKey) {
         this.langKey = langKey;
     }
-
-    public boolean getIsSelfService() { 
-    	return isSelfService; 
-    }
-
-    public void setIsSelfService(boolean isSelfService) { 
-    	this.isSelfService = isSelfService; 
-    }
-    
-    public String getClientId() {
-    	return clientId;
-    }
-    
-    public void setClientId(String clientId) {
-    	this.clientId = clientId;
-    }
-    
-    public String getSelfUserId() {
-    	return selfUserId;
-    }
-    
-    public void setSelfUserId(String selfUserId) {
-    	this.selfUserId = selfUserId;
-    }
     
     public Set<Authority> getAuthorities() {
         return authorities;
@@ -265,6 +247,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", mobile='" + mobile + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
+            ", clientId'" + clientId + '\'' +
+            ", selfServiceId'" + selfServiceId + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";
     }
