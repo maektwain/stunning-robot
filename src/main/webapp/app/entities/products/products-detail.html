@@ -1,0 +1,38 @@
+
+<div>
+    <h2><span>Products</span> {{vm.products.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Name</span></dt>
+        <dd>
+            <span>{{vm.products.name}}</span>
+        </dd>
+        <dt><span>Price</span></dt>
+        <dd>
+            <span>{{vm.products.price}}</span>
+        </dd>
+        <dt><span>Brand</span></dt>
+        <dd>
+            <span>{{vm.products.brand}}</span>
+        </dd>
+        <dt><span>Model</span></dt>
+        <dd>
+            <span>{{vm.products.model}}</span>
+        </dd>
+        <dt><span>Image Url</span></dt>
+        <dd>
+            <span>{{vm.products.imageUrl}}</span>
+        </dd>
+        <dt><span>Description</span></dt>
+        <dd>
+            <span>{{vm.products.description}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            onclick="window.history.back()"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+</div>
