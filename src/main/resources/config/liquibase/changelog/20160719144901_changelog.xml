@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="saransh (generated)" id="1468939747965-1">
+      <createTable tableName="jhi_self_service">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="jhi_self_servicePK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="datetime">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="datetime"/>
+         <column name="is_self_service" type="BOOLEAN">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1468939747965-2">
+      <addColumn tableName="jhi_user">
+         <column name="user_id" type="bigint"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1468939747965-3">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="jhi_user"
+                               constraintName="FK_a3y17wd3iikyw5phu1fvdsud8"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="user_id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1468939747965-4">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="jhi_user_authority"
+                               constraintName="FK_pg0oaw6mr9pt3ibeihdc1jwof"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="user_id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1468939747965-5">
+      <dropForeignKeyConstraint baseTableName="jhi_user_authority" constraintName="fk_user_id"/>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1468939747965-6">
+      <dropPrimaryKey tableName="jhi_user"/>
+      <addPrimaryKey columnNames="user_id"
+                     constraintName="jhi_userPK"
+                     tableName="jhi_user"/>
+   </changeSet>
+</databaseChangeLog>
