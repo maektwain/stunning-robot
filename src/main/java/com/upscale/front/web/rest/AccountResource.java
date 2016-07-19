@@ -11,7 +11,6 @@ import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -109,7 +109,12 @@ public class AccountResource {
                     managedUserDTO.getLastName(),managedUserDTO.getEmail(),managedUserDTO.getMobile(),
                     managedUserDTO.getLangKey());
                 //Implement SMS Service
-                smsService.SendSmS(user.getMobile(), RandomStringUtils.random(4));
+                try {
+                    smsService.SendOtp(user,user.getMobile());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return  new ResponseEntity<>(HttpStatus.CREATED);
             });
     }
@@ -125,6 +130,23 @@ public class AccountResource {
     @Timed
     public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
         return userService.activateRegistration(key)
+            .map(user -> new ResponseEntity<String>(HttpStatus.OK))
+            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    /**
+     * GET /activatem : activate the mobile registered
+     *
+     * @param code the activation code
+     * @return the ResponseEntity with status 200 (OK) and the activated user in  body or status 500 if the user cannot be activated
+     */
+
+    @RequestMapping(value = "/activatem",
+                    method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<String> activateFromMobile(@RequestParam(value = "code") String code, @RequestParam(value = "mobile") String mobile){
+        return userService.activateFromMobile(mobile, code)
             .map(user -> new ResponseEntity<String>(HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }

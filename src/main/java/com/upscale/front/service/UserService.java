@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +46,9 @@ public class UserService {
     @Inject
     private AuthorityRepository authorityRepository;
 
+    @Inject
+    private SMSService smsService;
+
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
         return userRepository.findOneByActivationKey(key)
@@ -55,6 +59,35 @@ public class UserService {
                 userRepository.save(user);
                 userSearchRepository.save(user);
                 log.debug("Activated user: {}", user);
+                return user;
+            });
+    }
+
+    public Optional<User> activateFromMobile(String mobile, String code){
+        log.debug("Activating user for code {}", code);
+        return userRepository.findOneByMobile(mobile)
+            .map(user -> {
+               //activate the given user for mobile number.
+                String requestId = user.getRequestId();
+
+                //First Verify Through Nexmo
+
+                try {
+                    smsService.verifyOTP(requestId,code);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                user.setActivated(true);
+                user.setActivationKey(null);
+
+                userRepository.save(user);
+                userSearchRepository.save(user);
+
+                log.debug("Activating User Through OTP", user);
+
+
+
                 return user;
             });
     }

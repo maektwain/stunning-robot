@@ -81,6 +81,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "reset_date", nullable = true)
     private ZonedDateTime resetDate = null;
 
+    @Column(name = "request_id", nullable = true)
+    private String requestId;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -101,6 +104,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public String getLogin() {
         return login;
     }
+
+    public String getRequestId() {return requestId;}
+
+    public void setRequestId(String requestId){this.requestId = requestId;}
 
     //Lowercase the login before saving it in database
     public void setLogin(String login) {
