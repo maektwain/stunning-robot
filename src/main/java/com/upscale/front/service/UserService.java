@@ -17,7 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -81,15 +86,62 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
 
+                /**
+                 * First mifos authentication will happen through an interface and then get the mifos base key and create a mifos
+                 */
+
+
                 userRepository.save(user);
                 userSearchRepository.save(user);
 
                 log.debug("Activating User Through OTP", user);
 
+                //Creating a self service user
+
+                createSelfService(user.getLogin(),user.getPassword());
+
 
 
                 return user;
             });
+    }
+
+    public void createSelfService(String u, String p){
+
+        try {
+
+            URL authurl = new URL("https://demo.openmf.org/fineract-provider/api/v1/authentication?username=mifos&password=password&tenantIdentifier=default");
+
+            HttpURLConnection connection = (HttpURLConnection) authurl.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new RuntimeException("Failed : HTTP error code : " + connection.getResponseCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String output;
+
+            System.out.println("Output From Server....\n");
+            while((output = br.readLine()) != null) {
+                System.out.println(output);
+
+            }
+
+            connection.disconnect();
+
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+
+        }catch (IOException e){
+
+            e.printStackTrace();
+        }
+
+
     }
 
     public Optional<User> completePasswordReset(String newPassword, String key) {

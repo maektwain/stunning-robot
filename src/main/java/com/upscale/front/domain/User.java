@@ -84,14 +84,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "request_id", nullable = true)
     private String requestId;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-        name = "jhi_user_authority",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private SelfServiceUser selfService = new SelfServiceUser();
 
     @JsonIgnore
     @ManyToMany
@@ -102,6 +94,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Authority> authorities = new HashSet<>();
 
+    @Column(name = "client_id", nullable = true)
+    private Long clientId;
+
+    @Column(name = "self_service_id", nullable = false)
+    private Long selfServiceId;
+
+
+
     public Long getId() {
         return id;
     }
@@ -109,6 +109,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Long getClientId() {return clientId; }
+
+    public void setClientId(Long id) {this.clientId = id;}
+
+    public Long getSelfServiceId() {return selfServiceId; }
+
+    public void setSelfServiceId(Long id) { this.selfServiceId = id;}
 
     public String getLogin() {
         return login;
@@ -240,6 +248,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", mobile='" + mobile + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
+            ", clientId'" + clientId + '\'' +
+            ", selfServiceId'" + selfServiceId + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";
     }
