@@ -84,15 +84,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "request_id", nullable = true)
     private String requestId;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-        name = "jhi_user_authority",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private SelfServiceUser selfService = new SelfServiceUser();
+    @NotNull
+    @Column(name = "is_selfService", nullable = false)
+    private boolean isSelfService;
 
+    @Column(name = "client_id", nullable = true)
+    private String clientId;
+    
+    @Column(name = "selfUser_id", nullable = true)
+    private String selfUserId;
+    
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -199,6 +200,30 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.langKey = langKey;
     }
 
+    public boolean getIsSelfService() { 
+    	return isSelfService; 
+    }
+
+    public void setIsSelfService(boolean isSelfService) { 
+    	this.isSelfService = isSelfService; 
+    }
+    
+    public String getClientId() {
+    	return clientId;
+    }
+    
+    public void setClientId(String clientId) {
+    	this.clientId = clientId;
+    }
+    
+    public String getSelfUserId() {
+    	return selfUserId;
+    }
+    
+    public void setSelfUserId(String selfUserId) {
+    	this.selfUserId = selfUserId;
+    }
+    
     public Set<Authority> getAuthorities() {
         return authorities;
     }
