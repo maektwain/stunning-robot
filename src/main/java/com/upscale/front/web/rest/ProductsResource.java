@@ -2,6 +2,7 @@ package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.upscale.front.domain.Products;
+import com.upscale.front.security.AuthoritiesConstants;
 import com.upscale.front.service.ProductsService;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import com.upscale.front.web.rest.util.PaginationUtil;
@@ -41,7 +42,7 @@ public class ProductsResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new products, or with status 400 (Bad Request) if the products has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @Secured(value = "ROLE_ADMIN")
+    @Secured(AuthoritiesConstants.ADMIN)
     @RequestMapping(value = "/products",
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,7 +70,7 @@ public class ProductsResource {
      * or with status 500 (Internal Server Error) if the products couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @Secured(value = "ROLE_ADMIN")
+    @Secured(AuthoritiesConstants.ADMIN)
     @RequestMapping(value = "/products",
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
@@ -131,7 +132,7 @@ public class ProductsResource {
      * @param id the id of the products to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @Secured(value = "ROLE_ADMIN")
+    @Secured(AuthoritiesConstants.ADMIN)
     @RequestMapping(value = "/products/{id}",
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
