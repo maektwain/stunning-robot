@@ -94,7 +94,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "client_id", nullable = true)
 	private Long clientId;
 
-	@Column(name = "self_service_id", nullable = false)
+	@Column(name = "self_service_id", nullable = true)
 	private Long selfServiceId;
 
 	public Long getId() {
