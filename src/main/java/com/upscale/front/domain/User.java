@@ -58,7 +58,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private String email;
 
     @Size(max = 10)
-    @Column(name = "mobile", length = 10)
+    @Column(name = "mobile", length = 10, unique = true)
     private String mobile;
 
     @NotNull
@@ -97,7 +97,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "client_id", nullable = true)
     private Long clientId;
 
-    @Column(name = "self_service_id", nullable = false)
+    @Column(name = "self_service_id", nullable = true)
     private Long selfServiceId;
 
 

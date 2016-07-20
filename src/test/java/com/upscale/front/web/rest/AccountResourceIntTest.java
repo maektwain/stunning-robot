@@ -395,4 +395,6 @@ public class AccountResourceIntTest {
         Optional<User> user = userRepository.findOneByEmail("funky@example.com");
         assertThat(user.isPresent()).isFalse();
     }
+
+
 }

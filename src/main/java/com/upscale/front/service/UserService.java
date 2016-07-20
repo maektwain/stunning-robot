@@ -9,6 +9,8 @@ import com.upscale.front.security.AuthoritiesConstants;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.util.RandomUtil;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,11 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -106,20 +110,51 @@ public class UserService {
             });
     }
 
+
+
     public void createSelfService(String u, String p){
 
         try {
 
-            URL authurl = new URL("https://demo.openmf.org/fineract-provider/api/v1/authentication?username=mifos&password=password&tenantIdentifier=default");
+
+
+
+            URL authurl = new URL("https://192.168.1.6:8443/fineract-provider/api/v1/users?tenantIdentifier=default");
 
             HttpURLConnection connection = (HttpURLConnection) authurl.openConnection();
+
+
+            String basicAuth = "Basic" + "bWlmb3M6cGFzc3dvcmQ=";
+            connection.setRequestProperty("Authorization" ,basicAuth);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
 
+
+            JSONObject jsonparam = new JSONObject();
+            jsonparam.put("username", "johndoe");
+            jsonparam.put("firstname", "john");
+            jsonparam.put("lastname", "doe");
+            jsonparam.put("email", "john@doe.com");
+            jsonparam.put("officeId", 1);
+            jsonparam.put("roles",1);
+            jsonparam.put("sendPasswordToEmail", false);
+            jsonparam.put("password","password");
+            jsonparam.put("repeatPassword", "password");
+            jsonparam.put("isSelfServiceUser",true);
+
+            DataOutputStream printout;
+
+            printout = new DataOutputStream(connection.getOutputStream());
+            printout.write(Integer.parseInt(URLEncoder.encode(jsonparam.toString(),"UTF-8")));
+            printout.flush();
+            printout.close();
+
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : " + connection.getResponseCode());
             }
+
+
 
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -139,7 +174,10 @@ public class UserService {
         }catch (IOException e){
 
             e.printStackTrace();
+        }catch (JSONException j){
+            j.printStackTrace();;
         }
+
 
 
     }

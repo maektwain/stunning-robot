@@ -8,7 +8,5 @@
          <column name="request_id" type="varchar(255)"/>
       </addColumn>
    </changeSet>
-   <changeSet author="saransh (generated)" id="1468854448009-2">
-      <dropUniqueConstraint constraintName="mobile" tableName="jhi_user"/>
-   </changeSet>
+
 </databaseChangeLog>
