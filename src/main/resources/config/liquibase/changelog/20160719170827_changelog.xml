@@ -11,7 +11,7 @@
    <changeSet author="saransh (generated)" id="1468948113511-2">
       <addColumn tableName="jhi_user">
          <column name="self_service_id" type="bigint">
-            <constraints nullable="false"/>
+            <constraints nullable="true"/>
          </column>
       </addColumn>
    </changeSet>
