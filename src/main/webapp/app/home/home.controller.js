@@ -5,9 +5,9 @@
         .module('frontendApp')
         .controller('HomeController', HomeController);
 
-    HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state'];
+    HomeController.$inject = ['$scope', 'Principal', 'LoginService','ProductSearch' ,'$state'];
 
-    function HomeController ($scope, Principal, LoginService, $state) {
+    function HomeController ($scope, Principal, LoginService,ProductSearch, $state) {
         var vm = this;
 
         vm.account = null;
@@ -29,5 +29,20 @@
         function register () {
             $state.go('register');
         }
+
+
+
+            $scope.search = function(){
+
+                    vm.q = $scope.searchString;
+
+                    if (vm.q.length > 1) {
+
+                        $scope.results = ProductSearch.query({query:vm.q});
+                    }
+            }
+
+
+
     }
 })();

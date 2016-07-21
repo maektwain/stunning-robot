@@ -4,8 +4,34 @@
             <span class="hipster img-responsive img-rounded"></span>
         </div>
         <div class="col-md-8">
-            <h1>Welcome, Java Hipster!</h1>
-            <p class="lead">This is your homepage</p>
+            <h1>Lend your dream!</h1>
+            <p class="lead">Upscale your finance ! </p>
+
+            <span>
+
+                <input type="text" class="form-control" ng-model="searchString" placeholder='Search: e.g. "Coffee Machine" or "Honda Activa"' ng-change="search()"/>
+
+            </span>
+
+
+
+            <div class="clearfix"></div>
+
+            <table id="list_of_products" class="table table-striped table-condensed" style="margin-top: 60px;">
+                <thead>
+                <tr>
+                    <th style="min-width: 80px;">Brand</th>
+                    <th style="min-width: 80px;">Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="result in results">
+                    <td><a href="#/products/{{result.id}}">{{ result.brand }}</a></td>
+                    <td>{{ result.name }}</td>
+                </tr>
+                </tbody>
+            </table>
+
 
             <div ng-switch="vm.isAuthenticated()">
                 <div class="alert alert-success" ng-switch-when="true">
