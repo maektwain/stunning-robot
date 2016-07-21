@@ -5,8 +5,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
 import javax.inject.Inject;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.cert.X509Certificate;
@@ -39,14 +41,6 @@ public class SelfUserService {
 				return null;
 			}
 
-			public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-				// Not implemented
-			}
-
-			public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-				// Not implemented
-			}
-
 			@Override
 			public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1)
 					throws CertificateException {
@@ -63,7 +57,7 @@ public class SelfUserService {
 		} };
 
 		try {
-			SSLContext sc = SSLContext.getInstance("TLS");
+			SSLContext sc = SSLContext.getInstance("SSL");
 
 			sc.init(null, trustAllCerts, new java.security.SecureRandom());
 
@@ -73,5 +67,15 @@ public class SelfUserService {
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
+		
+		HostnameVerifier allHostsValid = new HostnameVerifier() {
+
+			@Override
+			public boolean verify(String arg0, SSLSession arg1) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+        };
 	}
+
 }
