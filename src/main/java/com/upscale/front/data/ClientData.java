@@ -6,23 +6,23 @@ package com.upscale.front.data;
 public class ClientData {
 
 
-    final private Long officeId;
+    private Long officeId;
 
-    final private String firstname;
+    private String firstname;
 
-    final private String lastname;
+    private String lastname;
 
-    final private String externalId;
+    private String externalId;
 
-    final private String dateFormat;
+    private String dateFormat;
 
-    final private String locale;
+    private String locale;
 
-    final private String active;
+    private String active;
 
-    final private String activationDate;
+    private String activationDate;
 
-    final private String submittedOnDate;
+    private String submittedOnDate;
 
 
     /**
@@ -40,11 +40,6 @@ public class ClientData {
      * Maybe we need to define custom constructor,
      */
 
-
-
-
-
-
     public ClientData(final Long officeId,final String firstname,final String lastname, final String externalId,final String dateFormat, final String locale,
                                 final String active, final String activationDate, final String submittedOnDate){
 
@@ -59,6 +54,96 @@ public class ClientData {
         this.submittedOnDate = submittedOnDate;
 
     }
+
+
+	public Long getOfficeId() {
+		return officeId;
+	}
+
+
+	public void setOfficeId(Long officeId) {
+		this.officeId = officeId;
+	}
+
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+
+	public String getLastname() {
+		return lastname;
+	}
+
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
+	}
+
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+
+	public String getLocale() {
+		return locale;
+	}
+
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
+
+
+	public String getActive() {
+		return active;
+	}
+
+
+	public void setActive(String active) {
+		this.active = active;
+	}
+
+
+	public String getActivationDate() {
+		return activationDate;
+	}
+
+
+	public void setActivationDate(String activationDate) {
+		this.activationDate = activationDate;
+	}
+
+
+	public String getSubmittedOnDate() {
+		return submittedOnDate;
+	}
+
+
+	public void setSubmittedOnDate(String submittedOnDate) {
+		this.submittedOnDate = submittedOnDate;
+	}
 
 
 
