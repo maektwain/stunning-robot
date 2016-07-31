@@ -25,7 +25,7 @@
                 <constraints nullable="true" />
             </column>
             
-            <column name="userName" type="varchar(255)">
+            <column name="user_name" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             

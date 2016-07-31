@@ -3,7 +3,6 @@ package com.upscale.front.service;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -27,10 +26,11 @@ public class LoanProductsService {
 	@Inject
 	private LoanProductsSearchRepository loanProductsSearchRepository;
 	
+	
 	public LoanProducts save(LoanProducts loanProducts) {
 		log.debug("Request to save Loan Products : {}", loanProducts);
-		LoanProducts result  = loanProductsRepository.save(loanProducts);
-		loanProductsSearchRepository.save(result);
+		LoanProducts result = loanProductsRepository.saveAndFlush(loanProducts);
+		loanProductsSearchRepository.save(loanProducts);
 		return result;
 	}
 	

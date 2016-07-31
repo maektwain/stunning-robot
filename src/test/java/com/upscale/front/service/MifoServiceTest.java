@@ -3,6 +3,8 @@ package com.upscale.front.service;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.upscale.front.FrontendApp;
 import com.upscale.front.data.ClientData;
+import com.upscale.front.domain.LoanProducts;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
@@ -29,12 +31,15 @@ public class MifoServiceTest {
 
     @Inject
     private MifosBaseServices mifosBaseServices;
+    
+    @Inject
+    private LoanProductsService loanProductsService;
 
 
     @Test
     public void assertCreateClient() throws UnirestException{
 
-        ClientData clientData = new ClientData(1L,"saransh","sharma","1236", "dd MMMM yyyy","en", "true", "21 July 2016", "21 July 2016");
+        ClientData clientData = new ClientData(1L,"saransh","sharma","1237", "dd MMMM yyyy","en", "true", "21 July 2016", "21 July 2016");
 
 
 
@@ -46,10 +51,12 @@ public class MifoServiceTest {
     
     @Test
     public void assertRetrieveProducts() throws UnirestException{
-
-        mifosBaseServices.retrieveProduct("https://localhost:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier=default");
-
-
-
+/*
+       // LoanProducts loanProducts = mifosBaseServices.retrieveProduct("https://localhost:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier=default&pretty=true");
+        System.out.println("principal " + loanProducts.getPrincipal());
+        System.out.println("max Principal " + loanProducts.getMaxPrincipal());
+        
+        loanProductsService.save(loanProducts);
+        System.out.println("min Principal " + loanProducts.getMinPrincipal());*/
     }
 }

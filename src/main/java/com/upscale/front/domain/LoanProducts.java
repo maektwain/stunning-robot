@@ -34,7 +34,7 @@ public class LoanProducts implements Serializable{
     private String name;
     
     @Column(name = "tenant_id")
-    private Long tenantId;
+    private int tenantId;
     
     @Column(name = "principal")
     private BigDecimal principal;
@@ -45,14 +45,14 @@ public class LoanProducts implements Serializable{
     @Column(name = "min_principal")
     private BigDecimal minPrincipal;
     
-    /*@Column(name = "downpayment")
-    private BigDecimal downPayment;
+    @Column(name = "downpayment")
+    private BigDecimal downpayment;
     
     @Column(name = "max_downpayment")
-    private BigDecimal maxDownPayment;
+    private BigDecimal maxDownpayment;
     
     @Column(name = "min_downpayment")
-    private BigDecimal minDownPayment;*/
+    private BigDecimal minDownpayment;
     
     @Column(name = "tenure")
     private int tenure;
@@ -71,6 +71,9 @@ public class LoanProducts implements Serializable{
     
     @Column(name = "min_interest_rate")
     private BigDecimal minInterest;
+    
+    @Column(name = "description")
+    private String description;
 
 	public Long getId() {
 		return id;
@@ -88,11 +91,11 @@ public class LoanProducts implements Serializable{
 		this.name = name;
 	}
 
-	public Long getTenantId() {
+	public int getTenantId() {
 		return tenantId;
 	}
 
-	public void setTenantId(Long tenantId) {
+	public void setTenantId(int tenantId) {
 		this.tenantId = tenantId;
 	}
 
@@ -120,29 +123,29 @@ public class LoanProducts implements Serializable{
 		this.minPrincipal = minPrincipal;
 	}
 
-	/*public BigDecimal getDownPayment() {
-		return downPayment;
+	public BigDecimal getDownpayment() {
+		return downpayment;
 	}
 
-	public void setDownPayment(BigDecimal downPayment) {
-		this.downPayment = downPayment;
+	public void setDownpayment(BigDecimal downpayment) {
+		this.downpayment = downpayment;
 	}
 
-	public BigDecimal getMaxDownPayment() {
-		return maxDownPayment;
+	public BigDecimal getMaxDownpayment() {
+		return maxDownpayment;
 	}
 
-	public void setMaxDownPayment(BigDecimal maxDownPayment) {
-		this.maxDownPayment = maxDownPayment;
+	public void setMaxDownpayment(BigDecimal maxDownpayment) {
+		this.maxDownpayment = maxDownpayment;
 	}
 
-	public BigDecimal getMinDownPayment() {
-		return minDownPayment;
+	public BigDecimal getMinDownpayment() {
+		return minDownpayment;
 	}
 
-	public void setMinDownPayment(BigDecimal minDownPayment) {
-		this.minDownPayment = minDownPayment;
-	}*/
+	public void setMinDownpayment(BigDecimal minDownpayment) {
+		this.minDownpayment = minDownpayment;
+	}
 
 	public int getTenure() {
 		return tenure;
@@ -192,6 +195,14 @@ public class LoanProducts implements Serializable{
 		this.minInterest = minInterest;
 	}
     
+	public String getDescription(){
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -221,15 +232,16 @@ public class LoanProducts implements Serializable{
             ", principal='" + principal + "'" +
             ", maxPrincipal='" + maxPrincipal + "'" +
             ", minPrincipal='" + minPrincipal + "'" +
-            /*", downpayment='" + downPayment + "'" +
-            ", maxDownpayment='" + maxDownPayment + "'" +
-            ", minDownpayment='" + minDownPayment + "'" +*/
+            ", downpayment='" + downpayment + "'" +
+            ", maxDownpayment='" + maxDownpayment + "'" +
+            ", minDownpayment='" + minDownpayment + "'" +
             ", tenure='" + tenure + "'" +
             ", maxTenure='" + maxTenure + "'" +
             ", minTenure='" + minTenure + "'" +
             ", interest='" + interest + "'" +
             ", maxInterest='" + maxInterest + "'" +
             ", minInterest='" + minInterest + "'" +
+            ", description='" + description + "'" +
             '}';
     }
 }

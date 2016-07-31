@@ -15,31 +15,24 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-/**
- * 
- * @author Anurag Garg
- *
- */
+
 @Entity
 @Table(name = "jhi_tenant")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "tenant")
-public class Tenant extends AbstractAuditingEntity implements Serializable{
+public class Tenant implements Serializable{
 	
-	/**
-	 *  A tenant
-	 */
+	
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Size(max = 50)
 	@Column(name = "tenant_name")
-	private String tenant;
+	private String tenantName;
 	
-	@Column(name = "userName")
+	@Column(name = "user_name")
 	private String userName;
 	
 	@Column(name = "password")
@@ -57,11 +50,11 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
 	}
 
 	public String getTenant() {
-		return tenant;
+		return tenantName;
 	}
 
 	public void setTenant(String tenant) {
-		this.tenant = tenant;
+		this.tenantName = tenant;
 	}
 
 	public String getUserName() {
@@ -110,9 +103,9 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
     
     @Override
     public String toString() {
-        return "LoanProducts{" +
+        return "Tenant{" +
             "id=" + id +
-            ", tenant='" + tenant + "'" +
+            ", tenant='" + tenantName + "'" +
             ", username='" + userName + "'" +
             ", password='" + password + "'" +
             ", authkey='" + authKey + "'" +
