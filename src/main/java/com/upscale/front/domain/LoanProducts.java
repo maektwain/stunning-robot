@@ -1,77 +1,83 @@
 package com.upscale.front.domain;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @Table(name = "loan_products")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "loan_products")
-public class LoanProducts implements Serializable{
-	
+public class LoanProducts extends AbstractAuditingEntity implements Serializable{
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Id
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
+    }
+
+    @Id
+
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "name")
     private String name;
-    
-    @Column(name = "tenant_id")
-    private int tenantId;
-    
+
+
+    @ManyToOne
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
+
+
     @Column(name = "principal")
     private BigDecimal principal;
-    
+
     @Column(name = "max_principal")
     private BigDecimal maxPrincipal;
-    
+
     @Column(name = "min_principal")
     private BigDecimal minPrincipal;
-    
+
     @Column(name = "downpayment")
     private BigDecimal downpayment;
-    
+
     @Column(name = "max_downpayment")
     private BigDecimal maxDownpayment;
-    
+
     @Column(name = "min_downpayment")
     private BigDecimal minDownpayment;
-    
+
     @Column(name = "tenure")
     private int tenure;
-    
+
     @Column(name = "max_tenure")
     private int maxTenure;
-    
+
     @Column(name = "min_tenure")
     private int minTenure;
-    
+
     @Column(name = "interest_rate")
     private BigDecimal interest;
-    
+
     @Column(name = "max_interest_rate")
     private BigDecimal maxInterest;
-    
+
     @Column(name = "min_interest_rate")
     private BigDecimal minInterest;
-    
+
     @Column(name = "description")
     private String description;
 
@@ -91,13 +97,7 @@ public class LoanProducts implements Serializable{
 		this.name = name;
 	}
 
-	public int getTenantId() {
-		return tenantId;
-	}
 
-	public void setTenantId(int tenantId) {
-		this.tenantId = tenantId;
-	}
 
 	public BigDecimal getPrincipal() {
 		return principal;
@@ -194,15 +194,15 @@ public class LoanProducts implements Serializable{
 	public void setMinInterest(BigDecimal minInterest) {
 		this.minInterest = minInterest;
 	}
-    
+
 	public String getDescription(){
 		return description;
 	}
-	
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -222,13 +222,13 @@ public class LoanProducts implements Serializable{
     public int hashCode() {
         return Objects.hashCode(id);
     }
-    
+
     @Override
     public String toString() {
         return "LoanProducts{" +
             "id=" + id +
             ", name='" + name + "'" +
-            ", tenant='" + tenantId + "'" +
+            ", tenant='" + tenant + "'" +
             ", principal='" + principal + "'" +
             ", maxPrincipal='" + maxPrincipal + "'" +
             ", minPrincipal='" + minPrincipal + "'" +

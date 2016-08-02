@@ -1,6 +1,5 @@
 package com.upscale.front.service;
 
-import com.google.gson.Gson;
 import com.upscale.front.domain.Authority;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.AuthorityRepository;
@@ -10,8 +9,6 @@ import com.upscale.front.security.AuthoritiesConstants;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.util.RandomUtil;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -22,31 +19,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
+import javax.net.ssl.*;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service class for managing users.
@@ -71,8 +56,8 @@ public class UserService {
 
 	@Inject
 	private SMSService smsService;
-	
-	
+
+
 
 	public Optional<User> activateRegistration(String key) {
 		log.debug("Activating user for activation key {}", key);
@@ -125,7 +110,7 @@ public class UserService {
 	public void createSelfService(String u, String p) {
 
 		try {
-			
+
 			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
 					return null;
@@ -157,7 +142,7 @@ public class UserService {
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			}
-			
+
 			HostnameVerifier allHostsValid = new HostnameVerifier() {
 
 				@Override
@@ -166,7 +151,7 @@ public class UserService {
 					return false;
 				}
 	        };
-	        
+
 	        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
 			URL authurl = new URL("https://localhost:8443/fineract-provider/api/v1/users?tenantIdentifier=default");
@@ -179,12 +164,12 @@ public class UserService {
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Authorization", basicAuth);
-			
+
 			JSONObject jsonparam = new JSONObject();
 			ArrayList<Integer> list = new ArrayList<Integer>();
             list.add(1);
-     
-			
+
+
 			jsonparam.put("username", "johndoe");
 			jsonparam.put("firstname", "john");
 			jsonparam.put("lastname", "doe");
@@ -202,7 +187,7 @@ public class UserService {
 			os.write(jsonparam.toString().getBytes("UTF-8"));
 			os.flush();
 			os.close();
-			
+
 			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				throw new RuntimeException("Failed : HTTP error code : " + connection.getResponseCode());
 			}
@@ -210,9 +195,9 @@ public class UserService {
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
 			String output;
-			
+
 			StringBuffer response = new StringBuffer();
-			
+
 			System.out.println("Output From Server....\n");
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
@@ -221,12 +206,11 @@ public class UserService {
 
 			User user = new User();
 			JSONObject json = new JSONObject(output);
-			
-			user.setSelfServiceId(Long.parseLong(json.getString("resourceId")));
-			
+
+
 			connection.disconnect();
-			
-			
+
+
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -239,7 +223,7 @@ public class UserService {
 		}catch(NumberFormatException e){
 			e.printStackTrace();
 		}
-		
+
 
 	}
 

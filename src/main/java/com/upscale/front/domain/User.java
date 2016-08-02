@@ -91,13 +91,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private Set<Authority> authorities = new HashSet<>();
 
-	@Column(name = "client_id", nullable = true)
-	private Long clientId;
 
-	@Column(name = "self_service_id", nullable = true)
-	private Long selfServiceId;
 
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -106,21 +102,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.id = id;
 	}
 
-	public Long getClientId() {
-		return clientId;
-	}
 
-	public void setClientId(Long id) {
-		this.clientId = id;
-	}
-
-	public Long getSelfServiceId() {
-		return selfServiceId;
-	}
-
-	public void setSelfServiceId(Long id) {
-		this.selfServiceId = id;
-	}
 
 	public String getLogin() {
 		return login;
@@ -254,7 +236,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public String toString() {
 		return "User{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName
 				+ '\'' + ", email='" + email + '\'' + ", mobile='" + mobile + '\'' + ", activated='" + activated + '\''
-				+ ", langKey='" + langKey + '\'' + ", clientId'" + clientId + '\'' + ", selfServiceId'" + selfServiceId
+				+ ", langKey='" + langKey + '\''
 				+ '\'' + ", activationKey='" + activationKey + '\'' + "}";
 	}
 }
