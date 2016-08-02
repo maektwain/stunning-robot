@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="saransh (generated)" id="1470140463096-1">
+      <createTable tableName="jhi_tenant">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="jhi_tenantPK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="datetime">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="datetime"/>
+         <column name="auth_key" type="VARCHAR(255)"/>
+         <column name="password" type="VARCHAR(255)"/>
+         <column name="tenant_name" type="VARCHAR(255)"/>
+         <column name="user_name" type="VARCHAR(255)"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1470140463096-2">
+      <createTable tableName="loan_products">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="loan_productsPK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="datetime">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="datetime"/>
+         <column name="description" type="VARCHAR(255)"/>
+         <column name="downpayment" type="DECIMAL(19, 2)"/>
+         <column name="interest_rate" type="DECIMAL(19, 2)"/>
+         <column name="max_downpayment" type="DECIMAL(19, 2)"/>
+         <column name="max_interest_rate" type="DECIMAL(19, 2)"/>
+         <column name="max_principal" type="DECIMAL(19, 2)"/>
+         <column name="max_tenure" type="INT"/>
+         <column name="min_downpayment" type="DECIMAL(19, 2)"/>
+         <column name="min_interest_rate" type="DECIMAL(19, 2)"/>
+         <column name="min_principal" type="DECIMAL(19, 2)"/>
+         <column name="min_tenure" type="INT"/>
+         <column name="name" type="VARCHAR(255)"/>
+         <column name="principal" type="DECIMAL(19, 2)"/>
+         <column name="tenure" type="INT"/>
+         <column name="tenant_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1470140463096-3">
+      <addForeignKeyConstraint baseColumnNames="tenant_id"
+                               baseTableName="loan_products"
+                               constraintName="FK_lflbdx8kl1llg3q9tc1kijw4k"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_tenant"/>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1470140463096-4">
+      <dropColumn columnName="client_id" tableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="saransh (generated)" id="1470140463096-5">
+      <dropColumn columnName="self_service_id" tableName="jhi_user"/>
+   </changeSet>
+</databaseChangeLog>
