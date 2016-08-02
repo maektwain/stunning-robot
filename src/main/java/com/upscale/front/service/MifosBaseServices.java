@@ -12,7 +12,6 @@ import com.upscale.front.data.ClientData;
 import com.upscale.front.domain.LoanProducts;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.repository.TenantsRepository;
-
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -25,22 +24,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * Created by saransh on 20/07/16.
@@ -50,7 +42,6 @@ import javax.net.ssl.X509TrustManager;
 public class MifosBaseServices extends Unirest {
 
 	Logger log = LoggerFactory.getLogger(MifosBaseServices.class);
-	
 	@Inject
 	private TenantsRepository tenantsRepository;
 
@@ -94,7 +85,6 @@ public class MifosBaseServices extends Unirest {
 			}
 
 		});
-		
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom()
@@ -116,7 +106,6 @@ public class MifosBaseServices extends Unirest {
 			e.printStackTrace();
 		}
 
-		
 		System.out.println(client);
 
 		HttpResponse<JsonNode> post = Unirest.post(url).header("accept", "application/json")
@@ -129,12 +118,12 @@ public class MifosBaseServices extends Unirest {
 		System.out.println(post.getBody());
 		log.debug("String ", post);
 		JSONObject obj = post.getBody().getObject();
-		
+
 		System.out.println("Client ID is" + obj.getInt("clientId"));
 		return post;
 	}
-	
-	
+
+
 	public List<LoanProducts> retrieveProduct(String url, Long id)
 			throws UnirestException {
 
@@ -166,7 +155,6 @@ public class MifosBaseServices extends Unirest {
 			}
 
 		});
-		
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom()
@@ -176,7 +164,7 @@ public class MifosBaseServices extends Unirest {
 			CloseableHttpClient httpclient = HttpClients.custom()
 	                         .setSSLSocketFactory(sslsf)
 	                         .build();
-			Unirest.setHttpClient(httpclient);                     
+			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -207,7 +195,7 @@ public class MifosBaseServices extends Unirest {
 			JSONObject res = obj.getJSONObject(i);
 			//loanProducts.setId(res.getLong("id"));
 			loanProducts.setName(res.getString("name"));
-			loanProducts.setTenantId(tenant.getId().intValue());
+			loanProducts.setTenant(tenant);
 			loanProducts.setPrincipal(new BigDecimal(res.getLong("principal")));
 			loanProducts.setMaxPrincipal(new BigDecimal(res.getLong("maxPrincipal")));
 			loanProducts.setMinPrincipal(new BigDecimal(res.getLong("minPrincipal")));
