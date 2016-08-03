@@ -161,10 +161,11 @@ public class MifosBaseServices extends Unirest {
 
 		SSLContext sslcontext;
 		try {
+
 			sslcontext = SSLContexts.custom()
 			        .loadTrustMaterial(null, new TrustSelfSignedStrategy())
 			        .build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom()
 	                         .setSSLSocketFactory(sslsf)
 	                         .build();

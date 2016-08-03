@@ -62,13 +62,20 @@ public class LoanProductResource {
         }
 
 
+
         Tenant tenant = tenantRepository.findOneByTenantName(tenantName);
+
+        if (tenant ==  null){
+            return new ResponseEntity<Object>("The Tenant Does Not Exist", textHttpHeaders, HttpStatus.NOT_FOUND);
+        }
+
+
 
 
 
         try {
 
-            List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct("https://localhost:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier="+ tenant.getTenant() +"&pretty=true", tenant.getId());
+            List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct("https://192.168.1.6:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier="+ tenant.getTenant() +"&pretty=true", tenant.getId());
             for (LoanProducts products: loanProducts){
                 System.out.println("Product Name: " +products.getName());
                 loanProductsService.save(products);

@@ -20,6 +20,9 @@ public class LoanProducts extends AbstractAuditingEntity implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 
+
+
+
     public Tenant getTenant() {
         return tenant;
     }
@@ -39,6 +42,7 @@ public class LoanProducts extends AbstractAuditingEntity implements Serializable
 
     @ManyToOne
     @JoinColumn(name = "tenant_id", nullable = false)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Tenant tenant;
 
 

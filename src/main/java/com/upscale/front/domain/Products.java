@@ -42,6 +42,17 @@ public class Products implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "product_type")
+    private String productType;
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
+
     public Long getId() {
         return id;
     }
@@ -128,6 +139,7 @@ public class Products implements Serializable {
             ", model='" + model + "'" +
             ", imageUrl='" + imageUrl + "'" +
             ", description='" + description + "'" +
+            ", productType='" + productType + "'" +
             '}';
     }
 }

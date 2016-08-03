@@ -2,7 +2,6 @@ package com.upscale.front.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +11,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "jhi_tenant")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-@Document(indexName = "tenant")
 public class Tenant extends AbstractAuditingEntity implements Serializable{
 
 
@@ -26,12 +24,15 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
 	@Column(name = "tenant_name")
 	private String tenantName;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
 	@Column(name = "user_name")
 	private String userName;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
 	@Column(name = "password")
 	private String password;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
 	@Column(name = "auth_key")
 	private String authKey;
 
@@ -51,13 +52,15 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
 		this.tenantName = tenant;
 	}
 
-	public String getUserName() {
+
+    public String getUserName() {
 		return userName;
 	}
 
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+
 
 	public String getPassword() {
 		return password;
