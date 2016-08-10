@@ -1,4 +1,4 @@
-package com.upscale.front.domain;
+package com.upscale.front.web.rest.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,40 +17,44 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-import com.mysql.jdbc.Blob;
+import com.upscale.front.domain.AbstractAuditingEntity;
+import com.upscale.front.domain.Documents;
+import com.upscale.front.domain.User;
 
-@Entity
-@Table(name = "documents")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-@Document(indexName = "documents")
-public class Documents extends AbstractAuditingEntity implements Serializable {
+public class DocumentDTO {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	
 	private Long id;
-	
-	@Column(name = "document_type", nullable = false)
+
 	private String documentType;
 	
-	@Column(name = "document_name", nullable = false)
 	private String documentName;
 	
-	@Lob
-	@Column(name = "document_image", nullable = false, columnDefinition = "mediumblob")
 	private byte[] documentImage;
 	
-	@Column(name="content_type")
 	private String contentType;
 	
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	public DocumentDTO() {
+		
+	}
+	
+	public DocumentDTO(Documents doc) {
+		this(doc.getId(), doc.getDocumentType(), doc.getDocumentName(), doc.getDocumentImage(),
+				doc.getContentType(), doc.getUser());
+	}
+	
+	public DocumentDTO(Long id, String documentType, String documentName, byte[] documentImage,
+			String contentType, User user){
+		this.id = id;
+		this.documentType = documentType;
+		this.documentName = documentName;
+		this.documentImage = documentImage;
+		this.contentType = contentType;
+		this.user = user;
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -98,30 +102,10 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Documents documents = (Documents) o;
-		if (documents.id == null || id == null) {
-			return false;
-		}
-		return Objects.equals(id, documents.id);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id);
-	}
 	
 	@Override
 	public String toString() {
-		return "Document{" + "id=" + id + 
+		return "DocumentDTO{" + "id=" + id + 
 				", document Type='" + documentType + "'" + 
 				", document Name='" + documentName + "'" + 
 				", document Image='" + documentImage + "'" +

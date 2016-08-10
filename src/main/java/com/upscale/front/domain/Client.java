@@ -3,6 +3,7 @@ package com.upscale.front.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -39,6 +41,10 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	@JsonIgnore
+	@Column(name = "client_id", nullable = false)
+	private Long clientId;
+	
 	public Long getId() {
 		return id;
 	}
@@ -63,6 +69,14 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 		this.user = user;
 	}
 	
+	public Long getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -85,7 +99,10 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Client{" + "id=" + id + ", tenant Id='" + tenant + "'" + ", user='" + user + "'" + '}';
+		return "Client{" + "id=" + id + 
+				", tenant Id='" + tenant  + 
+				", clientId='" + clientId + 
+				", user='" + user + "'" + '}';
 	}
 
 }
