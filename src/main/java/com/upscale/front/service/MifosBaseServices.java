@@ -9,6 +9,7 @@ import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.upscale.front.data.ClientData;
+import com.upscale.front.domain.Client;
 import com.upscale.front.domain.LoanProducts;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.repository.TenantsRepository;
@@ -89,13 +90,9 @@ public class MifosBaseServices extends Unirest {
 
 		SSLContext sslcontext;
 		try {
-			sslcontext = SSLContexts.custom()
-			        .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-			        .build();
+			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
 			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-			CloseableHttpClient httpclient = HttpClients.custom()
-	                         .setSSLSocketFactory(sslsf)
-	                         .build();
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
 			// TODO Auto-generated catch block
@@ -107,7 +104,6 @@ public class MifosBaseServices extends Unirest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 
 		System.out.println(client);
 
@@ -126,9 +122,7 @@ public class MifosBaseServices extends Unirest {
 		return post;
 	}
 
-
-	public List<LoanProducts> retrieveProduct(String url, Long id)
-			throws UnirestException {
+	public List<LoanProducts> retrieveProduct(String url, Long id) throws UnirestException {
 
 		/**
 		 * Method which will get the loan product data
@@ -162,13 +156,10 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 
-			sslcontext = SSLContexts.custom()
-			        .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-			        .build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-			CloseableHttpClient httpclient = HttpClients.custom()
-	                         .setSSLSocketFactory(sslsf)
-	                         .build();
+			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
 			// TODO Auto-generated catch block
@@ -189,16 +180,16 @@ public class MifosBaseServices extends Unirest {
 
 		log.debug("String", result.getStatus());
 
-		//System.out.println();
-		//System.out.println(result.getBody());
+		// System.out.println();
+		// System.out.println(result.getBody());
 		log.debug("String ", result);
-		//JSONObject obj = result.getBody().getObject();
+		// JSONObject obj = result.getBody().getObject();
 		JSONArray obj = result.getBody().getArray();
 		//
-		for(int i = 0; i < obj.length(); i++){
+		for (int i = 0; i < obj.length(); i++) {
 			LoanProducts loanProducts = new LoanProducts();
 			JSONObject res = obj.getJSONObject(i);
-			//loanProducts.setId(res.getLong("id"));
+			// loanProducts.setId(res.getLong("id"));
 			loanProducts.setName(res.getString("name"));
 			loanProducts.setTenant(tenant);
 			loanProducts.setPrincipal(new BigDecimal(res.getLong("principal")));

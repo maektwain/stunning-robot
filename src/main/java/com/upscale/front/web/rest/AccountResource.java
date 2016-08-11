@@ -53,7 +53,7 @@ public class AccountResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountResource.class);
 	
-	private static final int MAX_RESULTS = 4;
+	private static final int MAX_RESULTS = 2;
 
 	@Inject
 	private UserRepository userRepository;
@@ -242,6 +242,14 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
+	
+	/**
+	 * GET /documents : get the current logged in user's document
+	 * 
+	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
+	 *         body, or status 500 (Internal Server Error) if the user's document couldn't
+	 *         be returned
+	 */
 	@RequestMapping(value = "/documents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Object> getDocuments() {
@@ -254,8 +262,9 @@ public class AccountResource {
 				entity.put("id", n.getId());
 				entity.put("documentType", n.getDocumentType());
 				entity.put("documentName", n.getDocumentName());
+				entity.put("documentData", n.getDocumentData());
 				//entity.put("documentImage", n.getDocumentImage());
-				if(n.getId() == 3){
+				/*if(n.getId() == 3){
 				try {
 					
 					TextDetection app = new TextDetection(TextDetection.getVisionService());
@@ -265,14 +274,14 @@ public class AccountResource {
 					System.out.println("Name: " + data[2]);
 					System.out.println("Father's Name: " + data[3]);
 					System.out.println("PAN: " + data[6]);
-					/*for(EntityAnnotation annotation: text) {
+					for(EntityAnnotation annotation: text) {
 						System.out.println("\t" + annotation.getDescription());
-					}*/
+					}
 				} catch (Exception e) {
 					System.out.println("Google vision api credential error");
 					e.printStackTrace();
 				}
-				}
+				}*/
 				entity.put("contentType", n.getContentType());
 				entities.add(entity);
 			}
@@ -280,6 +289,16 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
+	/**
+	 * POST /documents : upload the current user's documents
+	 * 
+	 * @param document 
+	 * 			the document model
+	 * @param file
+	 * 			document file 
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the documents not in proper format
+	 */
 	@RequestMapping(value = "/documents", method = RequestMethod.POST)
 	@Timed
 	public ResponseEntity<String> uploadDocuments(@ModelAttribute("documents") Documents document,
@@ -294,6 +313,19 @@ public class AccountResource {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			try {
+				
+				TextDetection app = new TextDetection(TextDetection.getVisionService());
+				List<EntityAnnotation> text = app.detectText(file.getBytes(), MAX_RESULTS);
+				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
+				document.setDocumentData(text.get(0).getDescription());
+		
+			} catch (Exception e) {
+				System.out.println("Google vision api credential error");
+				e.printStackTrace();
+			}
+			
 			documentService.save(document);
 
 			return new ResponseEntity<String>(HttpStatus.OK);

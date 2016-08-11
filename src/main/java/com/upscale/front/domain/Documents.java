@@ -44,6 +44,9 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "document_image", nullable = false, columnDefinition = "mediumblob")
 	private byte[] documentImage;
 	
+	@Column(name = "document_data")
+	private String documentData;
+	
 	@Column(name="content_type")
 	private String contentType;
 	
@@ -81,6 +84,15 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 
 	public void setDocumentImage(byte[] documentImage) {
 		this.documentImage = documentImage;
+	}
+
+	
+	public String getDocumentData() {
+		return documentData;
+	}
+
+	public void setDocumentData(String documentData) {
+		this.documentData = documentData;
 	}
 
 	public User getUser() {
