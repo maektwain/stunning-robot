@@ -17,10 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.net.URISyntaxException;
@@ -107,8 +104,11 @@ public class LoanProductResource {
 	public ResponseEntity<List<LoanProducts>> searchLoanProducts(@RequestParam String query, Pageable pageable)
 			throws URISyntaxException {
 		log.debug("REST request to search for a page of loan products for query {}", query);
-		Page<LoanProducts> page = loanProductsService.search(query, pageable);
-		HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/loanproducts");
+        Page<LoanProducts> page = loanProductsService.search(query, pageable);
+        HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/loanproducts");
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 	}
+
+
+
 }
