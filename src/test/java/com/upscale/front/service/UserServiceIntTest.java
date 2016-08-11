@@ -38,6 +38,9 @@ public class UserServiceIntTest {
     private UserService userService;
 
     @Inject
+    private DocumentService documentService;
+    
+    @Inject
     private SMSService smsService;
 
     @Test

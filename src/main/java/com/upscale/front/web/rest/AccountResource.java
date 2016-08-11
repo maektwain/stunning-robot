@@ -1,29 +1,47 @@
 package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.api.services.vision.v1.model.EntityAnnotation;
+import com.mysql.jdbc.Blob;
+import com.upscale.front.domain.Documents;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
+import com.upscale.front.service.DocumentService;
 import com.upscale.front.service.MailService;
 import com.upscale.front.service.SMSService;
+import com.upscale.front.service.TextDetection;
 import com.upscale.front.service.UserService;
+import com.upscale.front.web.rest.dto.DocumentDTO;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.mail.Multipart;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.xml.bind.DatatypeConverter;
+
 import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -33,245 +51,352 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class AccountResource {
 
-    private final Logger log = LoggerFactory.getLogger(AccountResource.class);
+	private final Logger log = LoggerFactory.getLogger(AccountResource.class);
+	
+	private static final int MAX_RESULTS = 2;
 
-    @Inject
-    private UserRepository userRepository;
+	@Inject
+	private UserRepository userRepository;
 
-    @Inject
-    private UserService userService;
+	@Inject
+	private UserService userService;
 
-    @Inject
-    private MailService mailService;
+	@Inject
+	private MailService mailService;
 
-    @Inject
-    private SMSService smsService;
+	@Inject
+	private DocumentService documentService;
 
-    /**
-     * POST  /register : register the user.
-     *
-     * @param managedUserDTO the managed user DTO
-     * @param request the HTTP request
-     * @return the ResponseEntity with status 201 (Created) if the user is registred or 400 (Bad Request) if the login or e-mail is already in use
-     */
-    @RequestMapping(value = "/register",
-                    method = RequestMethod.POST,
-                    produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    @Timed
-    public ResponseEntity<?> registerAccount(@Valid @RequestBody ManagedUserDTO managedUserDTO, HttpServletRequest request) {
+	@Inject
+	private SMSService smsService;
 
-        HttpHeaders textPlainHeaders = new HttpHeaders();
-        textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
+	/**
+	 * POST /register : register the user.
+	 *
+	 * @param managedUserDTO
+	 *            the managed user DTO
+	 * @param request
+	 *            the HTTP request
+	 * @return the ResponseEntity with status 201 (Created) if the user is
+	 *         registred or 400 (Bad Request) if the login or e-mail is already
+	 *         in use
+	 */
+	@RequestMapping(value = "/register", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.TEXT_PLAIN_VALUE })
+	@Timed
+	public ResponseEntity<?> registerAccount(@Valid @RequestBody ManagedUserDTO managedUserDTO,
+			HttpServletRequest request) {
 
-        return userRepository.findOneByLogin(managedUserDTO.getLogin().toLowerCase())
-            .map(user -> new ResponseEntity<>("login already in use", textPlainHeaders, HttpStatus.BAD_REQUEST))
-            .orElseGet(() -> userRepository.findOneByEmail(managedUserDTO.getEmail())
-                .map(user -> new ResponseEntity<>("e-mail address already in use", textPlainHeaders, HttpStatus.BAD_REQUEST))
-                .orElseGet(() -> {
-                    User user = userService.createUserInformation(managedUserDTO.getLogin(), managedUserDTO.getPassword(),
-                    managedUserDTO.getFirstName(), managedUserDTO.getLastName(), managedUserDTO.getEmail().toLowerCase(),managedUserDTO.getMobile(),
-                    managedUserDTO.getLangKey());
-                    String baseUrl = request.getScheme() + // "http"
-                    "://" +                                // "://"
-                    request.getServerName() +              // "myhost"
-                    ":" +                                  // ":"
-                    request.getServerPort() +              // "80"
-                    request.getContextPath();              // "/myContextPath" or "" if deployed in root context
+		HttpHeaders textPlainHeaders = new HttpHeaders();
+		textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
 
-                    mailService.sendActivationEmail(user, baseUrl);
-                    return new ResponseEntity<>(HttpStatus.CREATED);
-                })
-        );
-    }
+		return userRepository.findOneByLogin(managedUserDTO.getLogin().toLowerCase())
+				.map(user -> new ResponseEntity<>("login already in use", textPlainHeaders, HttpStatus.BAD_REQUEST))
+				.orElseGet(() -> userRepository.findOneByEmail(managedUserDTO.getEmail())
+						.map(user -> new ResponseEntity<>("e-mail address already in use", textPlainHeaders,
+								HttpStatus.BAD_REQUEST))
+						.orElseGet(() -> {
+							User user = userService.createUserInformation(managedUserDTO.getLogin(),
+									managedUserDTO.getPassword(), managedUserDTO.getFirstName(),
+									managedUserDTO.getLastName(), managedUserDTO.getEmail().toLowerCase(),
+									managedUserDTO.getMobile(), managedUserDTO.getLangKey());
+							String baseUrl = request.getScheme() + // "http"
+									"://" + // "://"
+									request.getServerName() + // "myhost"
+									":" + // ":"
+									request.getServerPort() + // "80"
+									request.getContextPath(); // "/myContextPath"
+																// or "" if
+																// deployed in
+																// root context
 
-    /**
-     * POST /mobileRegister : register through mobile.
-     *
-     * @param managedUserDTO the managed user DTO
-     * @param request the HTTP request
-     * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the login or mobile is already in use
-     *
-     */
+							mailService.sendActivationEmail(user, baseUrl);
+							return new ResponseEntity<>(HttpStatus.CREATED);
+						}));
+	}
 
-    @RequestMapping(value = "/mobileRegister",
-                    method = RequestMethod.POST,
-                    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    @Timed
-    public ResponseEntity<?> mobileRegister(@Valid @RequestBody ManagedUserDTO managedUserDTO, HttpServletRequest request){
-        HttpHeaders textHttpHeaders = new HttpHeaders();
+	/**
+	 * POST /mobileRegister : register through mobile.
+	 *
+	 * @param managedUserDTO
+	 *            the managed user DTO
+	 * @param request
+	 *            the HTTP request
+	 * @return the ResponseEntity with status 201 (Created) if the user is
+	 *         registered or 400 (Bad Request) if the login or mobile is already
+	 *         in use
+	 *
+	 */
 
-        textHttpHeaders.setContentType(MediaType.TEXT_PLAIN);
+	@RequestMapping(value = "/mobileRegister", method = RequestMethod.POST, produces = {
+			MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE })
+	@Timed
+	public ResponseEntity<?> mobileRegister(@Valid @RequestBody ManagedUserDTO managedUserDTO,
+			HttpServletRequest request) {
+		HttpHeaders textHttpHeaders = new HttpHeaders();
 
-        return userRepository.findOneByMobile(managedUserDTO.getMobile())
-            .map(user -> new ResponseEntity<>( "Mobile Already In Use", textHttpHeaders, HttpStatus.BAD_REQUEST))
-            .orElseGet(() -> {
-                User user = userService.createUserInformation(managedUserDTO.getLogin(),managedUserDTO.getPassword(),managedUserDTO.getFirstName(),
-                    managedUserDTO.getLastName(),managedUserDTO.getEmail(),managedUserDTO.getMobile(),
-                    managedUserDTO.getLangKey());
-                //Implement SMS Service
-                try {
-                    smsService.SendOtp(user,user.getMobile());
+		textHttpHeaders.setContentType(MediaType.TEXT_PLAIN);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return  new ResponseEntity<>(HttpStatus.CREATED);
-            });
-    }
-    /**
-     * GET  /activate : activate the registered user.
-     *
-     * @param key the activation key
-     * @return the ResponseEntity with status 200 (OK) and the activated user in body, or status 500 (Internal Server Error) if the user couldn't be activated
-     */
-    @RequestMapping(value = "/activate",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
-        return userService.activateRegistration(key)
-            .map(user -> new ResponseEntity<String>(HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-    }
+		return userRepository.findOneByMobile(managedUserDTO.getMobile())
+				.map(user -> new ResponseEntity<>("Mobile Already In Use", textHttpHeaders, HttpStatus.BAD_REQUEST))
+				.orElseGet(() -> {
+					User user = userService.createUserInformation(managedUserDTO.getLogin(),
+							managedUserDTO.getPassword(), managedUserDTO.getFirstName(), managedUserDTO.getLastName(),
+							managedUserDTO.getEmail(), managedUserDTO.getMobile(), managedUserDTO.getLangKey());
+					// Implement SMS Service
+					try {
+						smsService.SendOtp(user, user.getMobile());
 
-    /**
-     * GET /activatem : activate the mobile registered
-     *
-     * @param code the activation code
-     * @return the ResponseEntity with status 200 (OK) and the activated user in  body or status 500 if the user cannot be activated
-     */
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return new ResponseEntity<>(HttpStatus.CREATED);
+				});
+	}
 
-    @RequestMapping(value = "/activatem",
-                    method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<String> activateFromMobile(@RequestParam(value = "code") String code, @RequestParam(value = "mobile") String mobile){
-        return userService.activateFromMobile(mobile, code)
-            .map(user -> new ResponseEntity<String>(HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-    }
+	/**
+	 * GET /activate : activate the registered user.
+	 *
+	 * @param key
+	 *            the activation key
+	 * @return the ResponseEntity with status 200 (OK) and the activated user in
+	 *         body, or status 500 (Internal Server Error) if the user couldn't
+	 *         be activated
+	 */
+	@RequestMapping(value = "/activate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
+		return userService.activateRegistration(key).map(user -> new ResponseEntity<String>(HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
 
-    /**
-     * GET  /authenticate : check if the user is authenticated, and return its login.
-     *
-     * @param request the HTTP request
-     * @return the login if the user is authenticated
-     */
-    @RequestMapping(value = "/authenticate",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public String isAuthenticated(HttpServletRequest request) {
-        log.debug("REST request to check if the current user is authenticated");
-        return request.getRemoteUser();
-    }
+	/**
+	 * GET /activatem : activate the mobile registered
+	 *
+	 * @param code
+	 *            the activation code
+	 * @return the ResponseEntity with status 200 (OK) and the activated user in
+	 *         body or status 500 if the user cannot be activated
+	 */
 
-    /**
-     * GET  /account : get the current user.
-     *
-     * @return the ResponseEntity with status 200 (OK) and the current user in body, or status 500 (Internal Server Error) if the user couldn't be returned
-     */
-    @RequestMapping(value = "/account",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<UserDTO> getAccount() {
-        return Optional.ofNullable(userService.getUserWithAuthorities())
-            .map(user -> new ResponseEntity<>(new UserDTO(user), HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-    }
+	@RequestMapping(value = "/activatem", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> activateFromMobile(@RequestParam(value = "code") String code,
+			@RequestParam(value = "mobile") String mobile) {
+		return userService.activateFromMobile(mobile, code).map(user -> new ResponseEntity<String>(HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
 
-    /**
-     * POST  /account : update the current user information.
-     *
-     * @param userDTO the current user information
-     * @return the ResponseEntity with status 200 (OK), or status 400 (Bad Request) or 500 (Internal Server Error) if the user couldn't be updated
-     */
-    @RequestMapping(value = "/account",
-        method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<String> saveAccount(@Valid @RequestBody UserDTO userDTO) {
-        Optional<User> existingUser = userRepository.findOneByEmail(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userDTO.getLogin()))) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("user-management", "emailexists", "Email already in use")).body(null);
-        }
-        return userRepository
-            .findOneByLogin(SecurityUtils.getCurrentUserLogin())
-            .map(u -> {
-                userService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
-                    userDTO.getLangKey());
-                return new ResponseEntity<String>(HttpStatus.OK);
-            })
-            .orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-    }
+	/**
+	 * GET /authenticate : check if the user is authenticated, and return its
+	 * login.
+	 *
+	 * @param request
+	 *            the HTTP request
+	 * @return the login if the user is authenticated
+	 */
+	@RequestMapping(value = "/authenticate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public String isAuthenticated(HttpServletRequest request) {
+		log.debug("REST request to check if the current user is authenticated");
+		return request.getRemoteUser();
+	}
 
-    /**
-     * POST  /account/change_password : changes the current user's password
-     *
-     * @param password the new password
-     * @return the ResponseEntity with status 200 (OK), or status 400 (Bad Request) if the new password is not strong enough
-     */
-    @RequestMapping(value = "/account/change_password",
-        method = RequestMethod.POST,
-        produces = MediaType.TEXT_PLAIN_VALUE)
-    @Timed
-    public ResponseEntity<?> changePassword(@RequestBody String password) {
-        if (!checkPasswordLength(password)) {
-            return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
-        }
-        userService.changePassword(password);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+	/**
+	 * GET /account : get the current user.
+	 *
+	 * @return the ResponseEntity with status 200 (OK) and the current user in
+	 *         body, or status 500 (Internal Server Error) if the user couldn't
+	 *         be returned
+	 */
+	@RequestMapping(value = "/account", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<UserDTO> getAccount() {
+		return Optional.ofNullable(userService.getUserWithAuthorities())
+				.map(user -> new ResponseEntity<>(new UserDTO(user), HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
 
-    /**
-     * POST   /account/reset_password/init : Send an e-mail to reset the password of the user
-     *
-     * @param mail the mail of the user
-     * @param request the HTTP request
-     * @return the ResponseEntity with status 200 (OK) if the e-mail was sent, or status 400 (Bad Request) if the e-mail address is not registred
-     */
-    @RequestMapping(value = "/account/reset_password/init",
-        method = RequestMethod.POST,
-        produces = MediaType.TEXT_PLAIN_VALUE)
-    @Timed
-    public ResponseEntity<?> requestPasswordReset(@RequestBody String mail, HttpServletRequest request) {
-        return userService.requestPasswordReset(mail)
-            .map(user -> {
-                String baseUrl = request.getScheme() +
-                    "://" +
-                    request.getServerName() +
-                    ":" +
-                    request.getServerPort() +
-                    request.getContextPath();
-                mailService.sendPasswordResetMail(user, baseUrl);
-                return new ResponseEntity<>("e-mail was sent", HttpStatus.OK);
-            }).orElse(new ResponseEntity<>("e-mail address not registered", HttpStatus.BAD_REQUEST));
-    }
+	/**
+	 * POST /account : update the current user information.
+	 *
+	 * @param userDTO
+	 *            the current user information
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) or 500 (Internal Server Error) if the user couldn't be
+	 *         updated
+	 */
+	@RequestMapping(value = "/account", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> saveAccount(@Valid @RequestBody UserDTO userDTO) {
+		Optional<User> existingUser = userRepository.findOneByEmail(userDTO.getEmail());
+		if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userDTO.getLogin()))) {
+			return ResponseEntity.badRequest()
+					.headers(HeaderUtil.createFailureAlert("user-management", "emailexists", "Email already in use"))
+					.body(null);
+		}
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			userService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
+					userDTO.getLangKey());
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
 
-    /**
-     * POST   /account/reset_password/finish : Finish to reset the password of the user
-     *
-     * @param keyAndPassword the generated key and the new password
-     * @return the ResponseEntity with status 200 (OK) if the password has been reset,
-     * or status 400 (Bad Request) or 500 (Internal Server Error) if the password could not be reset
-     */
-    @RequestMapping(value = "/account/reset_password/finish",
-        method = RequestMethod.POST,
-        produces = MediaType.TEXT_PLAIN_VALUE)
-    @Timed
-    public ResponseEntity<String> finishPasswordReset(@RequestBody KeyAndPasswordDTO keyAndPassword) {
-        if (!checkPasswordLength(keyAndPassword.getNewPassword())) {
-            return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
-        }
-        return userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey())
-              .map(user -> new ResponseEntity<String>(HttpStatus.OK))
-              .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-    }
+	
+	/**
+	 * GET /documents : get the current logged in user's document
+	 * 
+	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
+	 *         body, or status 500 (Internal Server Error) if the user's document couldn't
+	 *         be returned
+	 */
+	@RequestMapping(value = "/documents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Object> getDocuments() {
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			List<Documents> doc = documentService.findAllByUser(u);
+			List<JSONObject> entities = new ArrayList<JSONObject>();
+			
+			for (Documents n : doc) {
+				JSONObject entity = new JSONObject();
+				entity.put("id", n.getId());
+				entity.put("documentType", n.getDocumentType());
+				entity.put("documentName", n.getDocumentName());
+				entity.put("documentData", n.getDocumentData());
+				//entity.put("documentImage", n.getDocumentImage());
+				/*if(n.getId() == 3){
+				try {
+					
+					TextDetection app = new TextDetection(TextDetection.getVisionService());
+					List<EntityAnnotation> text = app.detectText(n.getDocumentImage(), MAX_RESULTS);
+					System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
+					String[] data = StringUtils.split(text.get(0).getDescription(), "\n");
+					System.out.println("Name: " + data[2]);
+					System.out.println("Father's Name: " + data[3]);
+					System.out.println("PAN: " + data[6]);
+					for(EntityAnnotation annotation: text) {
+						System.out.println("\t" + annotation.getDescription());
+					}
+				} catch (Exception e) {
+					System.out.println("Google vision api credential error");
+					e.printStackTrace();
+				}
+				}*/
+				entity.put("contentType", n.getContentType());
+				entities.add(entity);
+			}
+			return new ResponseEntity<Object>(entities, HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
 
-    private boolean checkPasswordLength(String password) {
-        return (!StringUtils.isEmpty(password) &&
-            password.length() >= ManagedUserDTO.PASSWORD_MIN_LENGTH &&
-            password.length() <= ManagedUserDTO.PASSWORD_MAX_LENGTH);
-    }
+	/**
+	 * POST /documents : upload the current user's documents
+	 * 
+	 * @param document 
+	 * 			the document model
+	 * @param file
+	 * 			document file 
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the documents not in proper format
+	 */
+	@RequestMapping(value = "/documents", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<String> uploadDocuments(@ModelAttribute("documents") Documents document,
+			@RequestParam("file") MultipartFile file) {
+
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			document.setDocumentName(file.getOriginalFilename());
+			document.setContentType(file.getContentType());
+			document.setUser(u);
+			try {
+				document.setDocumentImage(file.getBytes());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				
+				TextDetection app = new TextDetection(TextDetection.getVisionService());
+				List<EntityAnnotation> text = app.detectText(file.getBytes(), MAX_RESULTS);
+				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
+				document.setDocumentData(text.get(0).getDescription());
+		
+			} catch (Exception e) {
+				System.out.println("Google vision api credential error");
+				e.printStackTrace();
+			}
+			
+			documentService.save(document);
+
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+
+	/**
+	 * POST /account/change_password : changes the current user's password
+	 *
+	 * @param password
+	 *            the new password
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the new password is not strong enough
+	 */
+	@RequestMapping(value = "/account/change_password", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+	@Timed
+	public ResponseEntity<?> changePassword(@RequestBody String password) {
+		if (!checkPasswordLength(password)) {
+			return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
+		}
+		userService.changePassword(password);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	/**
+	 * POST /account/reset_password/init : Send an e-mail to reset the password
+	 * of the user
+	 *
+	 * @param mail
+	 *            the mail of the user
+	 * @param request
+	 *            the HTTP request
+	 * @return the ResponseEntity with status 200 (OK) if the e-mail was sent,
+	 *         or status 400 (Bad Request) if the e-mail address is not
+	 *         registred
+	 */
+	@RequestMapping(value = "/account/reset_password/init", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+	@Timed
+	public ResponseEntity<?> requestPasswordReset(@RequestBody String mail, HttpServletRequest request) {
+		return userService.requestPasswordReset(mail).map(user -> {
+			String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+					+ request.getContextPath();
+			mailService.sendPasswordResetMail(user, baseUrl);
+			return new ResponseEntity<>("e-mail was sent", HttpStatus.OK);
+		}).orElse(new ResponseEntity<>("e-mail address not registered", HttpStatus.BAD_REQUEST));
+	}
+
+	/**
+	 * POST /account/reset_password/finish : Finish to reset the password of the
+	 * user
+	 *
+	 * @param keyAndPassword
+	 *            the generated key and the new password
+	 * @return the ResponseEntity with status 200 (OK) if the password has been
+	 *         reset, or status 400 (Bad Request) or 500 (Internal Server Error)
+	 *         if the password could not be reset
+	 */
+	@RequestMapping(value = "/account/reset_password/finish", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+	@Timed
+	public ResponseEntity<String> finishPasswordReset(@RequestBody KeyAndPasswordDTO keyAndPassword) {
+		if (!checkPasswordLength(keyAndPassword.getNewPassword())) {
+			return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
+		}
+		return userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey())
+				.map(user -> new ResponseEntity<String>(HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+
+	private boolean checkPasswordLength(String password) {
+		return (!StringUtils.isEmpty(password) && password.length() >= ManagedUserDTO.PASSWORD_MIN_LENGTH
+				&& password.length() <= ManagedUserDTO.PASSWORD_MAX_LENGTH);
+	}
+
 }

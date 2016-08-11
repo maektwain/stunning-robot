@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-1">
+      <createTable tableName="clients">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="clientsPK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="datetime">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="datetime"/>
+         <column name="client_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="tenant_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="user_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-2">
+      <createTable tableName="documents">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="documentsPK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="datetime">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="datetime"/>
+         <column name="content_type" type="VARCHAR(255)"/>
+         <column name="document_image" type="BLOB">
+            <constraints nullable="false"/>
+         </column>
+         <column name="document_name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="document_type" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="user_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-3">
+      <createTable tableName="loans">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="loansPK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="datetime">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="datetime"/>
+         <column name="tenant_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="user_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-4">
+      <addForeignKeyConstraint baseColumnNames="tenant_id"
+                               baseTableName="loans"
+                               constraintName="FK_3prwmqt47q45qdenmmhh9mpu1"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_tenant"/>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-5">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="documents"
+                               constraintName="FK_cqhq2rrt2xlo7tx5lbwqugr23"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-6">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="loans"
+                               constraintName="FK_l34jjpg81g9r2bd42svyp8epg"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-7">
+      <addForeignKeyConstraint baseColumnNames="tenant_id"
+                               baseTableName="clients"
+                               constraintName="FK_n0fynjqwu2orbbpuxw3kmtoco"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_tenant"/>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1470476005773-8">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="clients"
+                               constraintName="FK_smrp6gi0tckq1w5rnd7boyowu"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+</databaseChangeLog>

@@ -92,8 +92,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	private Set<Authority> authorities = new HashSet<>();
 
 
-
-
 	public Long getId() {
 		return id;
 	}
