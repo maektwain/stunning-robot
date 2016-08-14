@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -83,6 +84,19 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "request_id", nullable = true)
 	private String requestId;
 
+	@Lob
+	@Column(name = "user_image", nullable = true, columnDefinition = "mediumblob")
+	private byte[] userImage;
+	
+	@Column(name = "father_name", nullable = true)
+	private String fatherName;
+	
+	@Column(name = "birth_date", nullable = true)
+	private Date birthDate;
+	
+	@Column(name = "address", nullable = true)
+	private String address;
+	
 	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "jhi_user_authority", joinColumns = {
@@ -91,7 +105,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private Set<Authority> authorities = new HashSet<>();
 
-
 	public Long getId() {
 		return id;
 	}
@@ -99,8 +112,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-
 
 	public String getLogin() {
 		return login;
@@ -206,6 +217,39 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setAuthorities(Set<Authority> authorities) {
 		this.authorities = authorities;
 	}
+
+	public String getFatherName() {
+		return fatherName;
+	}
+
+	public void setFatherName(String fatherName) {
+		this.fatherName = fatherName;
+	}
+
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	public byte[] getUserImage() {
+		return userImage;
+	}
+
+	public void setUserImage(byte[] userImage) {
+		this.userImage = userImage;
+	}
+
 
 	@Override
 	public boolean equals(Object o) {

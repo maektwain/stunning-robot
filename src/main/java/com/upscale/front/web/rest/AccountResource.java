@@ -3,15 +3,21 @@ package com.upscale.front.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.mysql.jdbc.Blob;
+import com.upscale.front.domain.Client;
 import com.upscale.front.domain.Documents;
+import com.upscale.front.domain.Tenant;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
+import com.upscale.front.service.ClientService;
 import com.upscale.front.service.DocumentService;
 import com.upscale.front.service.MailService;
+import com.upscale.front.service.MifosBaseServices;
 import com.upscale.front.service.SMSService;
+import com.upscale.front.service.TenantService;
 import com.upscale.front.service.TextDetection;
 import com.upscale.front.service.UserService;
+import com.upscale.front.service.util.TextExtractionUtil;
 import com.upscale.front.web.rest.dto.DocumentDTO;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
@@ -69,7 +75,16 @@ public class AccountResource {
 
 	@Inject
 	private SMSService smsService;
+	
+	@Inject
+	private MifosBaseServices mifosBaseServices;
 
+	@Inject
+	private TenantService tenantService;
+	
+	@Inject
+	private ClientService clientService;
+	
 	/**
 	 * POST /register : register the user.
 	 *
@@ -242,7 +257,26 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
-	
+	@RequestMapping(value = "/account/client", 
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Object> createClient(@RequestParam(value = "tenant") String tenant){
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
+			if (tenant ==  null){
+	            return new ResponseEntity<Object>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+	        }
+			try {
+				Client client = mifosBaseServices.createClient(u, tenantData.get());
+				clientService.save(client);
+			} catch (Exception e) {
+				System.out.println("Client Creation Failed");
+				e.printStackTrace();
+			}
+			return new ResponseEntity<Object>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
 	/**
 	 * GET /documents : get the current logged in user's document
 	 * 
@@ -263,25 +297,7 @@ public class AccountResource {
 				entity.put("documentType", n.getDocumentType());
 				entity.put("documentName", n.getDocumentName());
 				entity.put("documentData", n.getDocumentData());
-				//entity.put("documentImage", n.getDocumentImage());
-				/*if(n.getId() == 3){
-				try {
-					
-					TextDetection app = new TextDetection(TextDetection.getVisionService());
-					List<EntityAnnotation> text = app.detectText(n.getDocumentImage(), MAX_RESULTS);
-					System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
-					String[] data = StringUtils.split(text.get(0).getDescription(), "\n");
-					System.out.println("Name: " + data[2]);
-					System.out.println("Father's Name: " + data[3]);
-					System.out.println("PAN: " + data[6]);
-					for(EntityAnnotation annotation: text) {
-						System.out.println("\t" + annotation.getDescription());
-					}
-				} catch (Exception e) {
-					System.out.println("Google vision api credential error");
-					e.printStackTrace();
-				}
-				}*/
+				entity.put("documentId", n.getDocumentId());
 				entity.put("contentType", n.getContentType());
 				entities.add(entity);
 			}
@@ -307,7 +323,6 @@ public class AccountResource {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
 			document.setDocumentName(file.getOriginalFilename());
 			document.setContentType(file.getContentType());
-			document.setUser(u);
 			try {
 				document.setDocumentImage(file.getBytes());
 			} catch (Exception e) {
@@ -320,12 +335,23 @@ public class AccountResource {
 				List<EntityAnnotation> text = app.detectText(file.getBytes(), MAX_RESULTS);
 				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
 				document.setDocumentData(text.get(0).getDescription());
-		
+				TextExtractionUtil data = new TextExtractionUtil();
+				String result = data.extractDocumentId(text.get(0).getDescription(), file.getContentType());
+				
+				if(result.equals("documeny type not found"))
+					document.setDocumentId(null);
+				else
+					document.setDocumentId(result);
+				u.setAddress(data.extractAddress(text.get(0).getDescription(), file.getContentType()));
+				u.setFatherName(data.extractFatherName(text.get(0).getDescription(), file.getContentType()));
+				u.setBirthDate(data.extractDOB(text.get(0).getDescription(), file.getContentType()));
 			} catch (Exception e) {
 				System.out.println("Google vision api credential error");
 				e.printStackTrace();
 			}
 			
+			userRepository.save(u);
+			document.setUser(u);
 			documentService.save(document);
 
 			return new ResponseEntity<String>(HttpStatus.OK);
