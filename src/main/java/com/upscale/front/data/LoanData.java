@@ -6,9 +6,11 @@ public class LoanData {
 
 	private Long clientId;
 	
-	private Long loanProductId;
+	private Long productId;
 	
-	private BigDecimal principal;
+	private String principal;
+	
+	//private String downPayment;
 	
 	private int loanTermFrequency;
 	
@@ -22,7 +24,7 @@ public class LoanData {
 	
 	private int repaymentFrequencyType = 1;
 	
-	private BigDecimal interestRatePerPeriod ;
+	private String interestRatePerPeriod ;
 	
 	private int amortizationType = 1;
 	
@@ -35,6 +37,26 @@ public class LoanData {
 	private String expectedDisbursementDate;
 	
 	private String submittedOnDate;
+	
+	private String dateFormat;
+
+    private String locale;
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
 
 	public Long getClientId() {
 		return clientId;
@@ -44,21 +66,29 @@ public class LoanData {
 		this.clientId = clientId;
 	}
 
-	public Long getLoanProductId() {
-		return loanProductId;
+	public Long getProductId() {
+		return productId;
 	}
 
-	public void setLoanProductId(Long loanProductId) {
-		this.loanProductId = loanProductId;
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 
-	public BigDecimal getPrincipal() {
+	public String getPrincipal() {
 		return principal;
 	}
 
-	public void setPrincipal(BigDecimal principal) {
+	public void setPrincipal(String principal) {
 		this.principal = principal;
 	}
+
+	/*public String getDownPayment() {
+		return downPayment;
+	}
+
+	public void setDownPayment(String downPayment) {
+		this.downPayment = downPayment;
+	}*/
 
 	public int getLoanTermFrequency() {
 		return loanTermFrequency;
@@ -108,11 +138,11 @@ public class LoanData {
 		this.repaymentFrequencyType = repaymentFrequencyType;
 	}
 
-	public BigDecimal getInterestRatePerPeriod() {
+	public String getInterestRatePerPeriod() {
 		return interestRatePerPeriod;
 	}
 
-	public void setInterestRatePerPeriod(BigDecimal interestRatePerPeriod) {
+	public void setInterestRatePerPeriod(String interestRatePerPeriod) {
 		this.interestRatePerPeriod = interestRatePerPeriod;
 	}
 

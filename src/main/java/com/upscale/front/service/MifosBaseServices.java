@@ -11,6 +11,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.upscale.front.data.ClientData;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.domain.Client;
+import com.upscale.front.domain.Loan;
 import com.upscale.front.domain.LoanProducts;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.domain.User;
@@ -18,6 +19,7 @@ import com.upscale.front.repository.TenantsRepository;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
@@ -27,10 +29,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -54,10 +64,6 @@ public class MifosBaseServices extends Unirest {
 	@Inject
 	private TenantsRepository tenantsRepository;
 	
-	
-	
-	
-
 	// Getting Values For this method like Url , and Objects or Values which are
 	// being sent , like officeId, firstName, lastName, externalId,
 
@@ -173,13 +179,10 @@ public class MifosBaseServices extends Unirest {
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -190,13 +193,8 @@ public class MifosBaseServices extends Unirest {
 				.asJson();
 
 		log.debug("String", result.getStatus());
-
-		// System.out.println();
-		// System.out.println(result.getBody());
 		log.debug("String ", result);
-		// JSONObject obj = result.getBody().getObject();
 		JSONArray obj = result.getBody().getArray();
-		//
 		for (int i = 0; i < obj.length(); i++) {
 			LoanProducts loanProducts = new LoanProducts();
 			JSONObject res = obj.getJSONObject(i);
@@ -220,11 +218,11 @@ public class MifosBaseServices extends Unirest {
 		return loanProductList;
 	}
 
-	public HttpResponse<JsonNode> createLoanAccount(LoanData loan, String url) throws UnirestException {
+	public Loan createLoanAccount(LoanData loan, Tenant tenant, User user) throws UnirestException {
 
 		/**
-		 * Method which will get the Loan Data and Url To Send For and returns
-		 * the
+		 * Method which will get the Loan Data along with tenant and user To Send For and returns
+		 * the loan Id
 		 */
 
 		if (loan == null) {
@@ -268,22 +266,143 @@ public class MifosBaseServices extends Unirest {
 			e.printStackTrace();
 		}
 
-		// System.out.println(client);
-
-		HttpResponse<JsonNode> post = Unirest.post(url).header("accept", "application/json")
-				.header("Content-Type", "application/json").header("Authorization", "Basic bWlmb3M6cGFzc3dvcmQ=")
+		HttpResponse<JsonNode> post = Unirest.post(URL + "/loans?tenantIdentifier=" + tenant.getTenant())
+				.header("accept", "application/json")
+				.header("Content-Type", "application/json").header("Authorization", "Basic " + tenant.getAuthKey())
 				.body(loan).asJson();
 
 		log.debug("String", post.getStatus());
-
-		/*
-		 * System.out.println(); System.out.println(post.getBody());
-		 */
 		log.debug("String ", post);
 		JSONObject obj = post.getBody().getObject();
+		Loan result = new Loan();
+		result.setLoanId(obj.getLong("loanId"));
+		result.setTenant(tenant);
+		result.setUser(user);
+		return result;
+	}
+	
+	public void uploadImage(Client client, Tenant tenant, User user) throws UnirestException, URISyntaxException, IOException {
 
-		// System.out.println("Client ID is" + obj.getInt("clientId"));
-		return post;
+		/**
+		 * Method which will get the Client Data along with tenant and user to upload image 
+		 * and returns the status
+		 */
+
+		if (user.getUserImage() == null) {
+			log.debug(user.toString());
+			throw new RuntimeException();
+		}
+
+		Unirest.setObjectMapper(new ObjectMapper() {
+			private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+			public <T> T readValue(String value, Class<T> valueType) {
+				try {
+					return jacksonObjectMapper.readValue(value, valueType);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			public String writeValue(Object value) {
+				try {
+					jacksonObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+					return jacksonObjectMapper.writeValueAsString(value);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
+
+		SSLContext sslcontext;
+		try {
+			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			Unirest.setHttpClient(httpclient);
+		} catch (KeyManagementException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		}
+		
+		InputStream in = new ByteArrayInputStream(user.getUserImage());
+		BufferedImage image = ImageIO.read(in);
+		ImageIO.write(image, "jpg", new File("D:\\userImage.jpg"));
+		HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/images?tenantIdentifier=" + tenant.getTenant())
+				.header("accept", "application/json")
+				.header("Authorization", "Basic " + tenant.getAuthKey())
+				.field("file", new File("D:\\userImage.jpg"), "image/jpeg")
+				.asString();	
+
+			log.debug("String", post.getStatus());
+			log.debug("String ", post);
+			System.out.println(post.getBody());
+	}
+	
+	public void uploadDocuments(Client client, Tenant tenant, User user) throws UnirestException, URISyntaxException, IOException {
+
+		/**
+		 * Method which will get the Client Data along with tenant and user to upload image 
+		 * and returns the status
+		 */
+
+		if (user.getUserImage() == null) {
+			log.debug(user.toString());
+			throw new RuntimeException();
+		}
+
+		Unirest.setObjectMapper(new ObjectMapper() {
+			private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+			public <T> T readValue(String value, Class<T> valueType) {
+				try {
+					return jacksonObjectMapper.readValue(value, valueType);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			public String writeValue(Object value) {
+				try {
+					jacksonObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+					return jacksonObjectMapper.writeValueAsString(value);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
+
+		SSLContext sslcontext;
+		try {
+			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			Unirest.setHttpClient(httpclient);
+		} catch (KeyManagementException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		}
+		
+		InputStream in = new ByteArrayInputStream(user.getUserImage());
+		BufferedImage image = ImageIO.read(in);
+		ImageIO.write(image, "jpg", new File("D:\\userImage.jpg"));
+		HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/images?tenantIdentifier=" + tenant.getTenant())
+				.header("accept", "application/json")
+				.header("Authorization", "Basic " + tenant.getAuthKey())
+				.field("file", new File("D:\\userImage.jpg"), "image/jpeg")
+				.asString();	
+
+			log.debug("String", post.getStatus());
+			log.debug("String ", post);
+			System.out.println(post.getBody());
 	}
 
 }

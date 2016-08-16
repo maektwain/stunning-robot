@@ -3,14 +3,17 @@ package com.upscale.front.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.mysql.jdbc.Blob;
+import com.upscale.front.data.LoanData;
 import com.upscale.front.domain.Client;
 import com.upscale.front.domain.Documents;
+import com.upscale.front.domain.Loan;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.ClientService;
 import com.upscale.front.service.DocumentService;
+import com.upscale.front.service.LoanService;
 import com.upscale.front.service.MailService;
 import com.upscale.front.service.MifosBaseServices;
 import com.upscale.front.service.SMSService;
@@ -24,6 +27,7 @@ import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
+import org.boon.di.In;
 import org.hibernate.Hibernate;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -35,6 +39,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,6 +89,9 @@ public class AccountResource {
 	
 	@Inject
 	private ClientService clientService;
+	
+	@Inject
+	private LoanService loanService;
 	
 	/**
 	 * POST /register : register the user.
@@ -257,24 +265,97 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
+	/***
+	 * POST /account/client : create a client for a tenant in mifos service
+	 * 
+	 * @param tenant
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the client created successfully 
+	 */
 	@RequestMapping(value = "/account/client", 
-			method = RequestMethod.POST,
+			method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<Object> createClient(@RequestParam(value = "tenant") String tenant){
+	public ResponseEntity<String> createClient(@RequestParam(value = "tenant") String tenant){
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			
 			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
+			
 			if (tenant ==  null){
-	            return new ResponseEntity<Object>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
 	        }
 			try {
-				Client client = mifosBaseServices.createClient(u, tenantData.get());
-				clientService.save(client);
+			//	Client client = mifosBaseServices.createClient(u, tenantData.get());
+				//clientService.save(client);
+				Client client = clientService.findOneByTenantAndUser(tenantData.get(), u);
+				mifosBaseServices.uploadImage(client, tenantData.get(), u);
 			} catch (Exception e) {
 				System.out.println("Client Creation Failed");
 				e.printStackTrace();
 			}
-			return new ResponseEntity<Object>(HttpStatus.OK);
+			
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+	
+	
+	/**
+	 * POST /documents : upload the current user's image
+	 * 
+	 * @param file
+	 * 			image file 
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the image not in proper format
+	 */
+	@RequestMapping(value = "/account/image", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			try {
+				u.setUserImage(file.getBytes());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			userRepository.save(u);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+	
+	
+	/***
+	 * POST /account/loan : create a loan for a tenant in mifos service
+	 * 
+	 * @param tenant
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the loan created successfully 
+	 */
+	@RequestMapping(value = "/account/loan", 
+			method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> createLoan(@RequestParam(value = "tenant") String tenant,
+			@RequestBody LoanData loanData){
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			
+			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
+			
+			if (tenantData ==  null){
+	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+	        }
+			
+			Client clientData = clientService.findOneByTenantAndUser(tenantData.get(), u);
+			if(clientData != null){
+				try {
+					loanData.setClientId(clientData.getClientId());
+					Loan loan = mifosBaseServices.createLoanAccount(loanData, tenantData.get(), u);
+					loanService.save(loan);
+				} catch (Exception e) {
+					System.out.println("Loan Creation Failed");
+					e.printStackTrace();
+				}
+			}
+			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 	/**
