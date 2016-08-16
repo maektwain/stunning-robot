@@ -40,6 +40,11 @@ public class ClientData {
      * Maybe we need to define custom constructor,
      */
 
+
+	public ClientData() {
+		super();
+	}
+
     public ClientData(final Long officeId,final String firstname,final String lastname, final String externalId,final String dateFormat, final String locale,
                                 final String active, final String activationDate, final String submittedOnDate){
 
@@ -54,7 +59,6 @@ public class ClientData {
         this.submittedOnDate = submittedOnDate;
 
     }
-
 
 	public Long getOfficeId() {
 		return officeId;

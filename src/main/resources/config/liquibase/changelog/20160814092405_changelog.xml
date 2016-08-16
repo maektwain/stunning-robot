@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-1">
+      <addColumn tableName="jhi_user">
+         <column name="address" type="varchar(255)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-2">
+      <addColumn tableName="jhi_user">
+         <column name="birth_date" type="datetime"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-3">
+      <addColumn tableName="documents">
+         <column name="document_id" type="varchar(255)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-4">
+      <addColumn tableName="jhi_user">
+         <column name="father_name" type="varchar(255)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-5">
+      <addColumn tableName="loans">
+         <column name="loan_id" type="bigint"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-6">
+      <addColumn tableName="loan_products">
+         <column name="mifos_product_id" type="bigint"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="Anurag Garg (generated)" id="1471166674702-7">
+      <addColumn tableName="jhi_user">
+         <column name="user_image" type="mediumblob"/>
+      </addColumn>
+   </changeSet>
+</databaseChangeLog>

@@ -1,5 +1,7 @@
 package com.upscale.front.service;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -32,10 +34,10 @@ public class TenantService {
 		return tenant;
 	}
 	
-	/*@Transactional(readOnly = true)
-	public Tenant findOneByTenantName(String tenantName) {
+	@Transactional(readOnly = true)
+	public Optional<Tenant> findOneByTenantName(String tenantName) {
 		log.debug("Request to get tenant : {}", tenantName);
-		Tenant tenant = tenantsRepository.findOneByTenantName(tenantName);
+		Optional<Tenant> tenant = tenantsRepository.findOneByTenantName(tenantName);
 		return tenant;
-	}*/
+	}
 }

@@ -2,23 +2,29 @@ package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
-import com.mysql.jdbc.Blob;
 import com.upscale.front.domain.Documents;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.DocumentService;
+import com.upscale.front.data.LoanData;
+import com.upscale.front.domain.Client;
+import com.upscale.front.domain.Loan;
+import com.upscale.front.domain.Tenant;
+import com.upscale.front.service.ClientService;
+import com.upscale.front.service.LoanService;
 import com.upscale.front.service.MailService;
+import com.upscale.front.service.MifosBaseServices;
 import com.upscale.front.service.SMSService;
 import com.upscale.front.service.TextDetection;
 import com.upscale.front.service.UserService;
-import com.upscale.front.web.rest.dto.DocumentDTO;
+import com.upscale.front.service.TenantService;
+import com.upscale.front.service.util.TextExtractionUtil;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Hibernate;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,20 +32,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.mail.Multipart;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
-
 import java.io.IOException;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +68,19 @@ public class AccountResource {
 
 	@Inject
 	private SMSService smsService;
+	
+	@Inject
+	private MifosBaseServices mifosBaseServices;
+
+	@Inject
+	private TenantService tenantService;
+	
+	@Inject
+	private ClientService clientService;
+	
+	@Inject
+	private LoanService loanService;
+	
 
 	/**
 	 * POST /register : register the user.
@@ -242,8 +254,102 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
+
+	/***
+	 * POST /account/client : create a client for a tenant in mifos service
+	 * 
+	 * @param tenant
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the client created successfully 
+	 */
+	@RequestMapping(value = "/account/client", 
+			method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> createClient(@RequestParam(value = "tenant") String tenant){
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			
+			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
+			
+			if (tenant ==  null){
+	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+	        }
+			try {
+			//	Client client = mifosBaseServices.createClient(u, tenantData.get());
+				//clientService.save(client);
+				Client client = clientService.findOneByTenantAndUser(tenantData.get(), u);
+				mifosBaseServices.uploadImage(client, tenantData.get(), u);
+			} catch (Exception e) {
+				System.out.println("Client Creation Failed");
+				e.printStackTrace();
+			}
+			
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+	
 	
 	/**
+	 * POST /documents : upload the current user's image
+	 * 
+	 * @param file
+	 * 			image file 
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the image not in proper format
+	 */
+	@RequestMapping(value = "/account/image", method = RequestMethod.POST)
+	@Timed
+	public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			try {
+				u.setUserImage(file.getBytes());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			userRepository.save(u);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+	
+	
+	/***
+	 * POST /account/loan : create a loan for a tenant in mifos service
+	 * 
+	 * @param tenant
+	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
+	 *         Request) if the loan created successfully 
+	 */
+	@RequestMapping(value = "/account/loan", 
+			method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<String> createLoan(@RequestParam(value = "tenant") String tenant,
+			@RequestBody LoanData loanData){
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			
+			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
+			
+			if (tenantData ==  null){
+	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+	        }
+			
+			Client clientData = clientService.findOneByTenantAndUser(tenantData.get(), u);
+			if(clientData != null){
+				try {
+					loanData.setClientId(clientData.getClientId());
+					Loan loan = mifosBaseServices.createLoanAccount(loanData, tenantData.get(), u);
+					loanService.save(loan);
+				} catch (Exception e) {
+					System.out.println("Loan Creation Failed");
+					e.printStackTrace();
+				}
+			}
+			return new ResponseEntity<String>(HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+	/**
+>>>>>>> Client
 	 * GET /documents : get the current logged in user's document
 	 * 
 	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
@@ -263,25 +369,7 @@ public class AccountResource {
 				entity.put("documentType", n.getDocumentType());
 				entity.put("documentName", n.getDocumentName());
 				entity.put("documentData", n.getDocumentData());
-				//entity.put("documentImage", n.getDocumentImage());
-				/*if(n.getId() == 3){
-				try {
-					
-					TextDetection app = new TextDetection(TextDetection.getVisionService());
-					List<EntityAnnotation> text = app.detectText(n.getDocumentImage(), MAX_RESULTS);
-					System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
-					String[] data = StringUtils.split(text.get(0).getDescription(), "\n");
-					System.out.println("Name: " + data[2]);
-					System.out.println("Father's Name: " + data[3]);
-					System.out.println("PAN: " + data[6]);
-					for(EntityAnnotation annotation: text) {
-						System.out.println("\t" + annotation.getDescription());
-					}
-				} catch (Exception e) {
-					System.out.println("Google vision api credential error");
-					e.printStackTrace();
-				}
-				}*/
+				entity.put("documentId", n.getDocumentId());
 				entity.put("contentType", n.getContentType());
 				entities.add(entity);
 			}
@@ -320,12 +408,23 @@ public class AccountResource {
 				List<EntityAnnotation> text = app.detectText(file.getBytes(), MAX_RESULTS);
 				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
 				document.setDocumentData(text.get(0).getDescription());
-		
+				TextExtractionUtil data = new TextExtractionUtil();
+				String result = data.extractDocumentId(text.get(0).getDescription(), file.getContentType());
+				
+				if(result.equals("documeny type not found"))
+					document.setDocumentId(null);
+				else
+					document.setDocumentId(result);
+				u.setAddress(data.extractAddress(text.get(0).getDescription(), file.getContentType()));
+				u.setFatherName(data.extractFatherName(text.get(0).getDescription(), file.getContentType()));
+				u.setBirthDate(data.extractDOB(text.get(0).getDescription(), file.getContentType()));
 			} catch (Exception e) {
 				System.out.println("Google vision api credential error");
 				e.printStackTrace();
 			}
 			
+			userRepository.save(u);
+			document.setUser(u);
 			documentService.save(document);
 
 			return new ResponseEntity<String>(HttpStatus.OK);

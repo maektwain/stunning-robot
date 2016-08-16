@@ -46,7 +46,10 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 	
 	@Column(name = "document_data")
 	private String documentData;
-	
+
+	@Column(name = "document_id", nullable = true)
+	private String documentId;
+
 	@Column(name="content_type")
 	private String contentType;
 	
@@ -86,13 +89,20 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 		this.documentImage = documentImage;
 	}
 
-	
 	public String getDocumentData() {
 		return documentData;
 	}
 
 	public void setDocumentData(String documentData) {
 		this.documentData = documentData;
+	}
+
+	public String getDocumentId() {
+		return documentId;
+	}
+
+	public void setDocumentId(String documentId) {
+		this.documentId = documentId;
 	}
 
 	public User getUser() {
