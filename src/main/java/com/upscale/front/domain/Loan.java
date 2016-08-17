@@ -15,6 +15,9 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 @Entity
 @Table(name = "loans")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -39,6 +42,10 @@ public class Loan extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	@JsonIgnore
+	@JoinColumn(name = "loan_id", nullable = false)
+	private Long loanId;
+	
 	public Long getId() {
 		return id;
 	}
@@ -63,6 +70,14 @@ public class Loan extends AbstractAuditingEntity implements Serializable {
 		this.user = user;
 	}
 	
+	public Long getLoanId() {
+		return loanId;
+	}
+
+	public void setLoanId(Long loanId) {
+		this.loanId = loanId;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

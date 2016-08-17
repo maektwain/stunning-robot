@@ -123,16 +123,4 @@ public class UserServiceIntTest {
         List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
         assertThat(users).isEmpty();
     }
-
-    @Test
-    public void testSelfServiceUser(){
-        String u = "username";
-        String p = "password";
-        userService.createSelfService(u,p);
-        /**
-         * Asserting a user is created and the authenticated with the self service user and providing a key of basic auth
-         */
-
-
-    }
 }
