@@ -275,10 +275,12 @@ public class AccountResource {
 	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
 	        }
 			try {
-			//	Client client = mifosBaseServices.createClient(u, tenantData.get());
-				//clientService.save(client);
-				Client client = clientService.findOneByTenantAndUser(tenantData.get(), u);
+				Client client = mifosBaseServices.createClient(u, tenantData.get());
+				clientService.save(client);
 				mifosBaseServices.uploadImage(client, tenantData.get(), u);
+				//Client client =clientService.findOneByTenantAndUser(tenantData.get(), u);
+				mifosBaseServices.uploadDocuments(client, tenantData.get(), u);
+				
 			} catch (Exception e) {
 				System.out.println("Client Creation Failed");
 				e.printStackTrace();
@@ -409,15 +411,15 @@ public class AccountResource {
 				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
 				document.setDocumentData(text.get(0).getDescription());
 				TextExtractionUtil data = new TextExtractionUtil();
-				String result = data.extractDocumentId(text.get(0).getDescription(), file.getContentType());
+				String result = data.extractDocumentId(text.get(0).getDescription(), document.getDocumentType());
 				
 				if(result.equals("documeny type not found"))
 					document.setDocumentId(null);
 				else
 					document.setDocumentId(result);
-				u.setAddress(data.extractAddress(text.get(0).getDescription(), file.getContentType()));
-				u.setFatherName(data.extractFatherName(text.get(0).getDescription(), file.getContentType()));
-				u.setBirthDate(data.extractDOB(text.get(0).getDescription(), file.getContentType()));
+				u.setAddress(data.extractAddress(text.get(0).getDescription(), document.getDocumentType()));
+				u.setFatherName(data.extractFatherName(text.get(0).getDescription(), document.getDocumentType()));
+				u.setBirthDate(data.extractDOB(text.get(0).getDescription(), document.getDocumentType()));
 			} catch (Exception e) {
 				System.out.println("Google vision api credential error");
 				e.printStackTrace();

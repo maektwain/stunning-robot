@@ -10,11 +10,13 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.upscale.front.data.ClientData;
 import com.upscale.front.domain.Client;
+import com.upscale.front.domain.Documents;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.domain.Loan;
 import com.upscale.front.domain.LoanProducts;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.domain.User;
+import com.upscale.front.repository.DocumentsRepository;
 import com.upscale.front.repository.TenantsRepository;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
@@ -46,9 +48,12 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by saransh on 20/07/16.
@@ -63,6 +68,9 @@ public class MifosBaseServices extends Unirest {
 	
 	@Inject
 	private TenantsRepository tenantsRepository;
+	
+	@Inject
+	private DocumentsRepository documentsRepository;
 	
 	// Getting Values For this method like Url , and Objects or Values which are
 	// being sent , like officeId, firstName, lastName, externalId,
@@ -347,12 +355,13 @@ public class MifosBaseServices extends Unirest {
 	public void uploadDocuments(Client client, Tenant tenant, User user) throws UnirestException, URISyntaxException, IOException {
 
 		/**
-		 * Method which will get the Client Data along with tenant and user to upload image 
+		 * Method which will get the Client Data along with tenant and user to upload documents 
 		 * and returns the status
 		 */
 
-		if (user.getUserImage() == null) {
-			log.debug(user.toString());
+		Optional<List<Documents>> document = documentsRepository.findAllByUserId(user.getId());
+		if (document.get() == null) {
+			log.debug(document.toString());
 			throw new RuntimeException();
 		}
 
@@ -392,18 +401,23 @@ public class MifosBaseServices extends Unirest {
 			e.printStackTrace();
 		}
 		
-		InputStream in = new ByteArrayInputStream(user.getUserImage());
-		BufferedImage image = ImageIO.read(in);
-		ImageIO.write(image, "jpg", new File("D:\\userImage.jpg"));
-		HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/images?tenantIdentifier=" + tenant.getTenant())
+		for(Documents doc: document.get()){
+			InputStream in = new ByteArrayInputStream(doc.getDocumentImage());
+			BufferedImage image = ImageIO.read(in);
+			//String fileName = doc.getDocumentName() + "_" + LocalDate.now() + ".jpg";
+			ImageIO.write(image, "jpg", new File("D:\\" + doc.getDocumentName() ));
+			HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/documents?tenantIdentifier=" + tenant.getTenant())
 				.header("accept", "application/json")
 				.header("Authorization", "Basic " + tenant.getAuthKey())
-				.field("file", new File("D:\\userImage.jpg"), "image/jpeg")
+				.field("description", doc.getDocumentData())
+				.field("name", doc.getDocumentName())
+				.field("file", new File("D:\\" + doc.getDocumentName() ), "image/jpeg")
 				.asString();	
 
 			log.debug("String", post.getStatus());
 			log.debug("String ", post);
 			System.out.println(post.getBody());
+		}
 	}
 
 }
