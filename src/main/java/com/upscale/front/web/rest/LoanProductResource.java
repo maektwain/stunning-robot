@@ -72,7 +72,7 @@ public class LoanProductResource {
 
         try {
 
-            List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct("https://192.168.1.6:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier="+ tenant.getTenant() +"&pretty=true", tenant.getId());
+            List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct("https://192.168.1.3:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier="+ tenant.getTenant() +"&pretty=true", tenant.getId());
             for (LoanProducts products: loanProducts){
                 System.out.println("Product Name: " +products.getName());
                 loanProductsService.save(products);

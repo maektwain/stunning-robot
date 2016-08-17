@@ -40,6 +40,7 @@
          <column name="document_image" type="VARCHAR(255)">
             <constraints nullable="false"/>
          </column>
+          <column name="content_type" type="VARCHAR(50)"/>
          <column name="document_name" type="VARCHAR(255)">
             <constraints nullable="false"/>
          </column>

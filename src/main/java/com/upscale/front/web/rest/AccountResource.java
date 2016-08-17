@@ -2,23 +2,16 @@ package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
-import com.mysql.jdbc.Blob;
 import com.upscale.front.domain.Documents;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
-import com.upscale.front.service.DocumentService;
-import com.upscale.front.service.MailService;
-import com.upscale.front.service.SMSService;
-import com.upscale.front.service.TextDetection;
-import com.upscale.front.service.UserService;
-import com.upscale.front.web.rest.dto.DocumentDTO;
+import com.upscale.front.service.*;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Hibernate;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,20 +19,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.mail.Multipart;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
-
 import java.io.IOException;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +38,7 @@ import java.util.Optional;
 public class AccountResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountResource.class);
-	
+
 	private static final int MAX_RESULTS = 2;
 
 	@Inject
@@ -242,10 +228,10 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
-	
+
 	/**
 	 * GET /documents : get the current logged in user's document
-	 * 
+	 *
 	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
 	 *         body, or status 500 (Internal Server Error) if the user's document couldn't
 	 *         be returned
@@ -256,7 +242,7 @@ public class AccountResource {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
 			List<Documents> doc = documentService.findAllByUser(u);
 			List<JSONObject> entities = new ArrayList<JSONObject>();
-			
+
 			for (Documents n : doc) {
 				JSONObject entity = new JSONObject();
 				entity.put("id", n.getId());
@@ -266,7 +252,7 @@ public class AccountResource {
 				//entity.put("documentImage", n.getDocumentImage());
 				/*if(n.getId() == 3){
 				try {
-					
+
 					TextDetection app = new TextDetection(TextDetection.getVisionService());
 					List<EntityAnnotation> text = app.detectText(n.getDocumentImage(), MAX_RESULTS);
 					System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
@@ -291,11 +277,11 @@ public class AccountResource {
 
 	/**
 	 * POST /documents : upload the current user's documents
-	 * 
-	 * @param document 
+	 *
+	 * @param document
 	 * 			the document model
 	 * @param file
-	 * 			document file 
+	 * 			document file
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
 	 *         Request) if the documents not in proper format
 	 */
@@ -313,19 +299,19 @@ public class AccountResource {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			try {
-				
+
 				TextDetection app = new TextDetection(TextDetection.getVisionService());
 				List<EntityAnnotation> text = app.detectText(file.getBytes(), MAX_RESULTS);
 				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
 				document.setDocumentData(text.get(0).getDescription());
-		
+
 			} catch (Exception e) {
 				System.out.println("Google vision api credential error");
 				e.printStackTrace();
 			}
-			
+
 			documentService.save(document);
 
 			return new ResponseEntity<String>(HttpStatus.OK);
