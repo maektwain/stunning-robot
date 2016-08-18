@@ -7,6 +7,11 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
 
 @Entity
 @Table(name = "jhi_tenant")
@@ -35,6 +40,15 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
     @com.fasterxml.jackson.annotation.JsonIgnore
 	@Column(name = "auth_key")
 	private String authKey;
+
+	public Tenant(Long id, String tenantName, String userName, String password, String authKey) {
+		super();
+		this.id = id;
+		this.tenantName = tenantName;
+		this.userName = userName;
+		this.password = password;
+		this.authKey = authKey;
+	}
 
 	public Long getId() {
 		return id;

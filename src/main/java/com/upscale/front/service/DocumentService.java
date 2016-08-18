@@ -14,6 +14,11 @@ import com.upscale.front.domain.Documents;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.DocumentsRepository;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
 @Service
 @Transactional
 public class DocumentService {

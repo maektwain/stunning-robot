@@ -15,9 +15,4 @@
          <column name="document_data" type="varchar(255)"/>
       </addColumn>
    </changeSet>
-   <changeSet author="Anurag Garg (generated)" id="1470900871747-3">
-      <dropNotNullConstraint columnDataType="varchar(255)"
-                             columnName="content_type"
-                             tableName="documents"/>
-   </changeSet>
 </databaseChangeLog>

@@ -14,6 +14,12 @@ import javax.inject.Inject;
 
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Service
 @Transactional
 public class LoanProductsService {

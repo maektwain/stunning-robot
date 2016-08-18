@@ -1,6 +1,12 @@
 package com.upscale.front.data;
 
-import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
 
 public class LoanData {
 
@@ -10,11 +16,9 @@ public class LoanData {
 	
 	private String principal;
 	
-	//private String downPayment;
-	
 	private int loanTermFrequency;
 	
-	private int loanTermFrequencyType;
+	private int loanTermFrequencyType = 1;
 	
 	private String loanType = "individual";
 	
@@ -41,6 +45,36 @@ public class LoanData {
 	private String dateFormat;
 
     private String locale;
+    
+    private List<Collateral> collateral;
+
+    
+	public LoanData(Long clientId, Long productId, String principal, int loanTermFrequency, int loanTermFrequencyType,
+			String loanType, int numberOfRepayments, int repaymentEvery, int repaymentFrequencyType,
+			String interestRatePerPeriod, int amortizationType, int interestType, int interestCalculationPeriodType,
+			int transactionProcessingStrategyId, String expectedDisbursementDate, String submittedOnDate,
+			String dateFormat, String locale, List<Collateral> collateral) {
+		super();
+		this.clientId = clientId;
+		this.productId = productId;
+		this.principal = principal;
+		this.loanTermFrequency = loanTermFrequency;
+		this.loanTermFrequencyType = loanTermFrequencyType;
+		this.loanType = loanType;
+		this.numberOfRepayments = numberOfRepayments;
+		this.repaymentEvery = repaymentEvery;
+		this.repaymentFrequencyType = repaymentFrequencyType;
+		this.interestRatePerPeriod = interestRatePerPeriod;
+		this.amortizationType = amortizationType;
+		this.interestType = interestType;
+		this.interestCalculationPeriodType = interestCalculationPeriodType;
+		this.transactionProcessingStrategyId = transactionProcessingStrategyId;
+		this.expectedDisbursementDate = expectedDisbursementDate;
+		this.submittedOnDate = submittedOnDate;
+		this.dateFormat = dateFormat;
+		this.locale = locale;
+		this.collateral = collateral;
+	}
 
 	public String getDateFormat() {
 		return dateFormat;
@@ -81,14 +115,6 @@ public class LoanData {
 	public void setPrincipal(String principal) {
 		this.principal = principal;
 	}
-
-	/*public String getDownPayment() {
-		return downPayment;
-	}
-
-	public void setDownPayment(String downPayment) {
-		this.downPayment = downPayment;
-	}*/
 
 	public int getLoanTermFrequency() {
 		return loanTermFrequency;
@@ -193,7 +219,12 @@ public class LoanData {
 	public void setSubmittedOnDate(String submittedOnDate) {
 		this.submittedOnDate = submittedOnDate;
 	}
-	
-	
-	
+
+	public List<Collateral> getCollateral() {
+		return collateral;
+	}
+
+	public void setCollateral(List<Collateral> collateral) {
+		this.collateral = collateral;
+	}
 }
