@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Anurag Garg
  *
  */
+
 @Entity
 @Table(name = "loans")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

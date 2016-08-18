@@ -56,10 +56,7 @@ public class MifoServiceTest {
     public void assertCreateClient() throws UnirestException{
 
         ClientData clientData = new ClientData(1L,"saransh","sharma","1237", "dd MMMM yyyy","en", "true", "21 July 2016", "21 July 2016");
-       // mifosBaseServices.createClient(clientData,"https://localhost:8443/fineract-provider/api/v1/clients?tenantIdentifier=default");
-
-
-
+        //mifosBaseServices.createClient(clientData,"https://localhost:8443/fineract-provider/api/v1/clients?tenantIdentifier=default");
     }
     
     @Test

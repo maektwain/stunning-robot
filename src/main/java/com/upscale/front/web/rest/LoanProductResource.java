@@ -111,6 +111,7 @@ public class LoanProductResource {
         }
         try {
 
+
             List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct(tenant.get());
             for (LoanProducts products: loanProducts){
                 System.out.println("Product Name: " +products.getName());

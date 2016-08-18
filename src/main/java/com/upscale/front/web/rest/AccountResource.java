@@ -320,7 +320,6 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 	
-	
 	/***
 	 * POST /account/loan : create a loan for a tenant in mifos service
 	 * 

@@ -22,6 +22,7 @@ import com.upscale.front.repository.TenantsRepository;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
@@ -38,6 +39,7 @@ import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -68,7 +70,13 @@ public class MifosBaseServices extends Unirest {
 	private static final String URL = "https://localhost:8443/fineract-provider/api/v1";
 	
 	@Inject
+	private TenantsRepository tenantsRepository;
+	
+	@Inject
 	private DocumentsRepository documentsRepository;
+	
+	// Getting Values For this method like Url , and Objects or Values which are
+	// being sent , like officeId, firstName, lastName, externalId,
 
 	public Client createClient(User user, Tenant tenant) throws UnirestException {
 
@@ -198,7 +206,6 @@ public class MifosBaseServices extends Unirest {
 		
 		log.debug("String", result.getStatus());
 		log.debug("String ", result);
-	
 		JSONArray obj = result.getBody().getArray();
 		for (int i = 0; i < obj.length(); i++) {
 			LoanProducts loanProducts = new LoanProducts();
@@ -356,9 +363,7 @@ public class MifosBaseServices extends Unirest {
 		return result;
 	}
 	
-	
 	public HttpResponse<String> uploadImage(Client client, Tenant tenant, User user) throws UnirestException, URISyntaxException, IOException {
-
 		/**
 		 * Method which will get the Client Data along with tenant and user to upload image 
 		 * and returns the status
@@ -420,7 +425,7 @@ public class MifosBaseServices extends Unirest {
 	}
 	
 	public ArrayList<Integer> uploadDocuments(Client client, Tenant tenant, User user) throws UnirestException, URISyntaxException, IOException {
-
+	
 		/**
 		 * Method which will get the Client Data along with tenant and user to upload documents 
 		 * and returns the status
@@ -488,5 +493,4 @@ public class MifosBaseServices extends Unirest {
 		
 		return status;
 	}
-
 }

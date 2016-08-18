@@ -7,6 +7,7 @@ import java.util.List;
  * @author Anurag Garg
  *
  */
+import java.math.BigDecimal;
 
 public class LoanData {
 
@@ -19,7 +20,7 @@ public class LoanData {
 	private int loanTermFrequency;
 	
 	private int loanTermFrequencyType = 1;
-	
+		
 	private String loanType = "individual";
 	
 	private int numberOfRepayments;

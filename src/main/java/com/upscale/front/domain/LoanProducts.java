@@ -216,6 +216,7 @@ public class LoanProducts extends AbstractAuditingEntity implements Serializable
 		this.tenant = tenant;
 	}
 
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
