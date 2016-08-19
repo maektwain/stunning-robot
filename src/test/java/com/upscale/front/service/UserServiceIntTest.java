@@ -39,7 +39,7 @@ public class UserServiceIntTest {
 
     @Inject
     private DocumentService documentService;
-    
+
     @Inject
     private SMSService smsService;
 
@@ -125,14 +125,7 @@ public class UserServiceIntTest {
     }
 
     @Test
-    public void testSelfServiceUser(){
-        String u = "username";
-        String p = "password";
-        userService.createSelfService(u,p);
-        /**
-         * Asserting a user is created and the authenticated with the self service user and providing a key of basic auth
-         */
-
+    public void testImageAsyncHappening(){
 
     }
 }

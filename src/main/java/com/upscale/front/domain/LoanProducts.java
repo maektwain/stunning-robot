@@ -13,77 +13,66 @@ import java.util.Objects;
 @Table(name = "loan_products")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "loan_products")
-public class LoanProducts extends AbstractAuditingEntity implements Serializable{
+public class LoanProducts extends AbstractAuditingEntity implements Serializable {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
+	@Column(name = "name")
+	private String name;
 
+	@Column(name = "mifos_product_id")
+	private Long mifosProductId;
+	
+	@ManyToOne
+	@JoinColumn(name = "tenant_id", nullable = false)
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Tenant tenant;
 
-    public Tenant getTenant() {
-        return tenant;
-    }
+	@Column(name = "principal")
+	private BigDecimal principal;
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
-    }
+	@Column(name = "max_principal")
+	private BigDecimal maxPrincipal;
 
-    @Id
+	@Column(name = "min_principal")
+	private BigDecimal minPrincipal;
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Column(name = "downpayment")
+	private BigDecimal downpayment;
 
-    @Column(name = "name")
-    private String name;
+	@Column(name = "max_downpayment")
+	private BigDecimal maxDownpayment;
 
+	@Column(name = "min_downpayment")
+	private BigDecimal minDownpayment;
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id", nullable = false)
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Tenant tenant;
+	@Column(name = "tenure")
+	private int tenure;
 
+	@Column(name = "max_tenure")
+	private int maxTenure;
 
-    @Column(name = "principal")
-    private BigDecimal principal;
+	@Column(name = "min_tenure")
+	private int minTenure;
 
-    @Column(name = "max_principal")
-    private BigDecimal maxPrincipal;
+	@Column(name = "interest_rate")
+	private BigDecimal interest;
 
-    @Column(name = "min_principal")
-    private BigDecimal minPrincipal;
+	@Column(name = "max_interest_rate")
+	private BigDecimal maxInterest;
 
-    @Column(name = "downpayment")
-    private BigDecimal downpayment;
+	@Column(name = "min_interest_rate")
+	private BigDecimal minInterest;
 
-    @Column(name = "max_downpayment")
-    private BigDecimal maxDownpayment;
-
-    @Column(name = "min_downpayment")
-    private BigDecimal minDownpayment;
-
-    @Column(name = "tenure")
-    private int tenure;
-
-    @Column(name = "max_tenure")
-    private int maxTenure;
-
-    @Column(name = "min_tenure")
-    private int minTenure;
-
-    @Column(name = "interest_rate")
-    private BigDecimal interest;
-
-    @Column(name = "max_interest_rate")
-    private BigDecimal maxInterest;
-
-    @Column(name = "min_interest_rate")
-    private BigDecimal minInterest;
-
-    @Column(name = "description")
-    private String description;
+	@Column(name = "description")
+	private String description;
 
 	public Long getId() {
 		return id;
@@ -101,7 +90,13 @@ public class LoanProducts extends AbstractAuditingEntity implements Serializable
 		this.name = name;
 	}
 
+	public Long getMifosProductId() {
+		return mifosProductId;
+	}
 
+	public void setMifosProductId(Long mifosProductId) {
+		this.mifosProductId = mifosProductId;
+	}
 
 	public BigDecimal getPrincipal() {
 		return principal;
@@ -199,7 +194,7 @@ public class LoanProducts extends AbstractAuditingEntity implements Serializable
 		this.minInterest = minInterest;
 	}
 
-	public String getDescription(){
+	public String getDescription() {
 		return description;
 	}
 
@@ -207,45 +202,42 @@ public class LoanProducts extends AbstractAuditingEntity implements Serializable
 		this.description = description;
 	}
 
+	public Tenant getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(Tenant tenant) {
+		this.tenant = tenant;
+	}
+
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        LoanProducts loanProducts = (LoanProducts) o;
-        if(loanProducts.id == null || id == null) {
-            return false;
-        }
-        return Objects.equals(id, loanProducts.id);
-    }
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		LoanProducts loanProducts = (LoanProducts) o;
+		if (loanProducts.id == null || id == null) {
+			return false;
+		}
+		return Objects.equals(id, loanProducts.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
+	}
 
-    @Override
-    public String toString() {
-        return "LoanProducts{" +
-            "id=" + id +
-            ", name='" + name + "'" +
-            ", tenant='" + tenant + "'" +
-            ", principal='" + principal + "'" +
-            ", maxPrincipal='" + maxPrincipal + "'" +
-            ", minPrincipal='" + minPrincipal + "'" +
-            ", downpayment='" + downpayment + "'" +
-            ", maxDownpayment='" + maxDownpayment + "'" +
-            ", minDownpayment='" + minDownpayment + "'" +
-            ", tenure='" + tenure + "'" +
-            ", maxTenure='" + maxTenure + "'" +
-            ", minTenure='" + minTenure + "'" +
-            ", interest='" + interest + "'" +
-            ", maxInterest='" + maxInterest + "'" +
-            ", minInterest='" + minInterest + "'" +
-            ", description='" + description + "'" +
-            '}';
-    }
+	@Override
+	public String toString() {
+		return "LoanProducts{" + "id=" + id + ", name='" + name + "'" + ", tenant='" + tenant + "'" + ", principal='"
+				+ principal + "'" + ", maxPrincipal='" + maxPrincipal + "'" + ", minPrincipal='" + minPrincipal + "'"
+				+ ", downpayment='" + downpayment + "'" + ", maxDownpayment='" + maxDownpayment + "'"
+				+ ", minDownpayment='" + minDownpayment + "'" + ", tenure='" + tenure + "'" + ", maxTenure='"
+				+ maxTenure + "'" + ", minTenure='" + minTenure + "'" + ", interest='" + interest + "'"
+				+ ", maxInterest='" + maxInterest + "'" + ", minInterest='" + minInterest + "'" + ", description='"
+				+ description + "'" + '}';
+	}
 }

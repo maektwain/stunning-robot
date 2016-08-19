@@ -101,13 +101,13 @@ public class UserService {
 
 			// Creating a self service user
 
-			createSelfService(user.getLogin(), user.getPassword());
+			//createSelfService(user.getLogin(), user.getPassword());
 
 			return user;
 		});
 	}
 
-	public void createSelfService(String u, String p) {
+	/*public void createSelfService(String u, String p) {
 
 		try {
 
@@ -225,7 +225,7 @@ public class UserService {
 		}
 
 
-	}
+	}*/
 
 	public Optional<User> completePasswordReset(String newPassword, String key) {
 		log.debug("Reset user password for reset key {}", key);

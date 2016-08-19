@@ -43,7 +43,7 @@ public class MifoServiceTest {
 
 
 
-        mifosBaseServices.createClient(clientData,"https://localhost:8443/fineract-provider/api/v1/clients?tenantIdentifier=default");
+        //mifosBaseServices.createClient(clientData,"https://localhost:8443/fineract-provider/api/v1/clients?tenantIdentifier=default");
 
 
 
