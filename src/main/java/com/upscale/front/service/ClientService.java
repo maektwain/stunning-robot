@@ -14,6 +14,11 @@ import com.upscale.front.domain.Tenant;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.ClientsRepository;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
 @Service
 @Transactional
 public class ClientService {

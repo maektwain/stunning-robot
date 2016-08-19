@@ -24,6 +24,11 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.common.collect.ImmutableList;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
 @Service
 @Transactional
 public class TextDetection {

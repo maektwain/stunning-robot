@@ -2,9 +2,11 @@ package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.upscale.front.domain.Collateral;
 import com.upscale.front.domain.LoanProducts;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.repository.TenantsRepository;
+import com.upscale.front.service.CollateralService;
 import com.upscale.front.service.LoanProductsService;
 import com.upscale.front.service.MifosBaseServices;
 import com.upscale.front.web.rest.util.HeaderUtil;
@@ -39,7 +41,48 @@ public class LoanProductResource {
 	@Inject
 	private TenantsRepository tenantRepository;
 
+	@Inject
+	private CollateralService collateralService;
+	
+	
+	@RequestMapping(value = "/collateral",
+			method = RequestMethod.GET,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<?> createCollateral(@RequestParam(value = "tenantName") String tenantName)  {
 
+		log.debug("Rest request to save collateral : {}" );
+
+        HttpHeaders textHttpHeaders = new HttpHeaders();
+
+        textHttpHeaders.setContentType(MediaType.TEXT_PLAIN);
+
+        /**
+         * When provided the tenant name it should check whether  the tenant Exist or Not then Replay things
+         */
+        if (tenantName == null){
+            return new ResponseEntity<>("Please add TenantName", textHttpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Optional<Tenant> tenant = tenantRepository.findOneByTenantName(tenantName);
+
+        if (tenant ==  null){
+            return new ResponseEntity<Object>("The Tenant Does Not Exist", textHttpHeaders, HttpStatus.NOT_FOUND);
+        }
+        try {
+
+            List<Collateral> collaterals = mifosBaseServices.retrieveCollateralList(tenant.get());
+            for (Collateral collateral: collaterals){
+                collateralService.save(collateral);
+            }
+        }catch (UnirestException e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityCreationAlert("collateral added for tenant", tenant.get().getTenant()))
+            .body(null);
+    }
+
+	
 	@RequestMapping(value = "/loanproducts",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,14 +109,10 @@ public class LoanProductResource {
         if (tenant ==  null){
             return new ResponseEntity<Object>("The Tenant Does Not Exist", textHttpHeaders, HttpStatus.NOT_FOUND);
         }
-
-
-
-
-
         try {
 
-            List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct("https://192.168.1.6:8443/fineract-provider/api/v1/loanproducts?tenantIdentifier="+ tenant.get().getTenant() +"&pretty=true", tenant.get().getId());
+
+            List<LoanProducts> loanProducts = mifosBaseServices.retrieveProduct(tenant.get());
             for (LoanProducts products: loanProducts){
                 System.out.println("Product Name: " +products.getName());
                 loanProductsService.save(products);
@@ -81,9 +120,6 @@ public class LoanProductResource {
         }catch (UnirestException e){
             e.printStackTrace();
         }
-
-
-
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityCreationAlert("loanproducts added for tenant", tenant.get().getTenant()))
             .body(null);

@@ -12,6 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.upscale.front.domain.Documents;
 import com.upscale.front.domain.User;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Repository
 @Transactional
 public interface DocumentsRepository extends JpaRepository<Documents, Long>{

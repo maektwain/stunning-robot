@@ -8,6 +8,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Entity
 @Table(name = "documents")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
