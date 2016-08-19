@@ -12,6 +12,12 @@ import com.upscale.front.domain.Client;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.domain.User;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Repository
 @Transactional
 public interface ClientsRepository extends JpaRepository<Client	, Long> {

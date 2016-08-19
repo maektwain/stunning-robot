@@ -19,6 +19,12 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 import com.mysql.jdbc.Blob;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Entity
 @Table(name = "documents")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

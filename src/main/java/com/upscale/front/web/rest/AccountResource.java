@@ -7,11 +7,14 @@ import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.DocumentService;
+import com.upscale.front.service.LoanProductsService;
+import com.upscale.front.data.Collateral;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.domain.Client;
 import com.upscale.front.domain.Loan;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.service.ClientService;
+import com.upscale.front.service.CollateralService;
 import com.upscale.front.service.LoanService;
 import com.upscale.front.service.MailService;
 import com.upscale.front.service.MifosBaseServices;
@@ -81,6 +84,11 @@ public class AccountResource {
 	@Inject
 	private LoanService loanService;
 	
+	@Inject
+	private LoanProductsService loanProductsService;
+	
+	@Inject
+	private CollateralService collateralService;
 
 	/**
 	 * POST /register : register the user.
@@ -271,21 +279,19 @@ public class AccountResource {
 			
 			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
 			
-			if (tenant ==  null){
+			if (tenantData ==  null){
 	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
 	        }
 			try {
 				Client client = mifosBaseServices.createClient(u, tenantData.get());
 				clientService.save(client);
 				mifosBaseServices.uploadImage(client, tenantData.get(), u);
-				//Client client =clientService.findOneByTenantAndUser(tenantData.get(), u);
 				mifosBaseServices.uploadDocuments(client, tenantData.get(), u);
 				
 			} catch (Exception e) {
 				System.out.println("Client Creation Failed");
 				e.printStackTrace();
 			}
-			
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
@@ -314,7 +320,6 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 	
-	
 	/***
 	 * POST /account/loan : create a loan for a tenant in mifos service
 	 * 
@@ -329,17 +334,19 @@ public class AccountResource {
 	public ResponseEntity<String> createLoan(@RequestParam(value = "tenant") String tenant,
 			@RequestBody LoanData loanData){
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
-			
 			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
-			
 			if (tenantData ==  null){
 	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
 	        }
-			
 			Client clientData = clientService.findOneByTenantAndUser(tenantData.get(), u);
 			if(clientData != null){
 				try {
 					loanData.setClientId(clientData.getClientId());
+					List<Collateral> collateral = loanData.getCollateral();
+					collateral.get(0).setType(collateralService.findCollateralByTenantAndName(tenantData.get(),
+							loanProductsService.findOne(loanData.getProductId()).getName()).getMifosCollateralId());
+					loanData.setCollateral(collateral);
+					loanData.setProductId(loanProductsService.findOne(loanData.getProductId()).getMifosProductId());
 					Loan loan = mifosBaseServices.createLoanAccount(loanData, tenantData.get(), u);
 					loanService.save(loan);
 				} catch (Exception e) {
@@ -350,8 +357,8 @@ public class AccountResource {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
+	
 	/**
->>>>>>> Client
 	 * GET /documents : get the current logged in user's document
 	 * 
 	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
@@ -370,8 +377,9 @@ public class AccountResource {
 				entity.put("id", n.getId());
 				entity.put("documentType", n.getDocumentType());
 				entity.put("documentName", n.getDocumentName());
-				entity.put("documentData", n.getDocumentData());
+				entity.put("documentData", StringUtils.split(n.getDocumentData(),"\n"));
 				entity.put("documentId", n.getDocumentId());
+				entity.put("documentImage", n.getDocumentImage());
 				entity.put("contentType", n.getContentType());
 				entities.add(entity);
 			}
@@ -404,15 +412,16 @@ public class AccountResource {
 				e.printStackTrace();
 			}
 			
+			/**
+			 *  Google vision api for extracting data from the document
+			 */
 			try {
-				
 				TextDetection app = new TextDetection(TextDetection.getVisionService());
 				List<EntityAnnotation> text = app.detectText(file.getBytes(), MAX_RESULTS);
 				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
 				document.setDocumentData(text.get(0).getDescription());
 				TextExtractionUtil data = new TextExtractionUtil();
 				String result = data.extractDocumentId(text.get(0).getDescription(), document.getDocumentType());
-				
 				if(result.equals("documeny type not found"))
 					document.setDocumentId(null);
 				else
@@ -428,7 +437,6 @@ public class AccountResource {
 			userRepository.save(u);
 			document.setUser(u);
 			documentService.save(document);
-
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}

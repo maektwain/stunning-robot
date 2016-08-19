@@ -12,6 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.upscale.front.domain.Loan;
 import com.upscale.front.repository.LoansRepository;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Service
 @Transactional
 public class LoanService {

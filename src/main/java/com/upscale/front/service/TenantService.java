@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.repository.TenantsRepository;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
 @Service
 @Transactional
 public class TenantService {

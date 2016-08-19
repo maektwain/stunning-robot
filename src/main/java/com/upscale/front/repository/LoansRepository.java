@@ -10,6 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.upscale.front.domain.Loan;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+
 @Repository
 @Transactional
 public interface LoansRepository extends JpaRepository<Loan, Long> {
