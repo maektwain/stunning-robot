@@ -10,7 +10,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.upscale.front.data.ClientData;
 import com.upscale.front.domain.Client;
-import com.upscale.front.domain.Collateral;
+import com.upscale.front.domain.CollateralData;
 import com.upscale.front.domain.Documents;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.domain.Loan;
@@ -231,7 +231,7 @@ public class MifosBaseServices extends Unirest {
 		return loanProductList;
 	}
 	
-	public List<Collateral> retrieveCollateralList(Tenant tenant) throws UnirestException {
+	public List<CollateralData> retrieveCollateralList(Tenant tenant) throws UnirestException {
 
 		/**
 		 * Method which will get the collateral types with code values
@@ -278,7 +278,7 @@ public class MifosBaseServices extends Unirest {
 			e.printStackTrace();
 		}
 
-		List<Collateral> collateralList = new ArrayList<Collateral>();
+		List<CollateralData> collateralList = new ArrayList<CollateralData>();
 		HttpResponse<JsonNode> result = Unirest.get(URL + "/codes/2/codevalues?tenantIdentifier=" + tenant.getTenant())
 				.header("accept", "application/json")
 				.header("Content-Type", "application/json").header("Authorization", "Basic " + tenant.getAuthKey())
@@ -288,7 +288,7 @@ public class MifosBaseServices extends Unirest {
 		log.debug("String ", result);
 		JSONArray obj = result.getBody().getArray();
 		for (int i = 0; i < obj.length(); i++) {
-			Collateral collateral = new Collateral();
+			CollateralData collateral = new CollateralData();
 			JSONObject res = obj.getJSONObject(i);
 			collateral.setName(res.getString("name"));
 			collateral.setTenant(tenant);

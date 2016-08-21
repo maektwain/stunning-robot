@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.upscale.front.domain.Collateral;
+import com.upscale.front.domain.CollateralData;
 import com.upscale.front.domain.Tenant;
 
 /***
@@ -22,9 +22,9 @@ import com.upscale.front.domain.Tenant;
 
 @Repository
 @Transactional
-public interface CollateralRepository extends JpaRepository<Collateral, Long>{
+public interface CollateralRepository extends JpaRepository<CollateralData, Long>{
 	
 	public final Logger log = LoggerFactory.getLogger(CollateralRepository.class);
 	
-	Optional<Collateral> findCollateralByTenantAndName(Tenant tenant, String name);
+	Optional<CollateralData> findCollateralByTenantAndName(Tenant tenant, String name);
 }

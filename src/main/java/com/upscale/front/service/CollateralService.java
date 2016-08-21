@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.upscale.front.domain.Collateral;
+import com.upscale.front.domain.CollateralData;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.repository.CollateralRepository;
 
@@ -30,30 +30,30 @@ public class CollateralService {
 	@Inject
 	private CollateralRepository collateralRepository;
 
-	public Collateral save(Collateral collateral) {
+	public CollateralData save(CollateralData collateral) {
 		log.debug("Request to save Collateral : {}", collateral);
-		Collateral result = collateralRepository.saveAndFlush(collateral);
+		CollateralData result = collateralRepository.saveAndFlush(collateral);
 		return result;
 	}
 
 	@Transactional(readOnly = true)
-	public Page<Collateral> findAll(Pageable pageable) {
+	public Page<CollateralData> findAll(Pageable pageable) {
 		log.debug("Request to get all Collaterals");
-		Page<Collateral> result = collateralRepository.findAll(pageable);
+		Page<CollateralData> result = collateralRepository.findAll(pageable);
 		return result;
 	}
 
 	@Transactional(readOnly = true)
-	public Collateral findOne(Long id) {
+	public CollateralData findOne(Long id) {
 		log.debug("Request to get collateral : {}", id);
-		Collateral collateral = collateralRepository.findOne(id);
+		CollateralData collateral = collateralRepository.findOne(id);
 		return collateral;
 	}
 
 	@Transactional(readOnly = true)
-	public Collateral findCollateralByTenantAndName(Tenant tenant, String name) {
+	public CollateralData findCollateralByTenantAndName(Tenant tenant, String name) {
 		log.debug("Request to get collateral by Tenant and Name : {}", tenant.getTenant(), name);
-		Optional<Collateral> collateral = collateralRepository.findCollateralByTenantAndName(tenant, name);
+		Optional<CollateralData> collateral = collateralRepository.findCollateralByTenantAndName(tenant, name);
 		return collateral.get();
 	}
 	public void delete(Long id) {

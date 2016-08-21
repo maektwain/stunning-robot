@@ -50,7 +50,7 @@ public class LoanData {
 	 * 		weeks = 1
 	 * 		months = 2
 	 */
-	private int repaymentFrequencyType = 1;
+	private int repaymentFrequencyType = 2;
 	
 	private String interestRatePerPeriod ;
 	
@@ -102,13 +102,20 @@ public class LoanData {
 	
 	private String submittedOnDate;
 	
-	private String dateFormat;
+	private String dateFormat = "dd MMMM yyyy";
 
-    private String locale;
+    private String locale = "en_GB";
     
     private List<Collateral> collateral;
 
     
+	/**
+	 * 
+	 */
+	public LoanData() {
+		super();
+	}
+
 	public LoanData(Long clientId, Long productId, String principal, int loanTermFrequency, int loanTermFrequencyType,
 			String loanType, int numberOfRepayments, int repaymentEvery, int repaymentFrequencyType,
 			String interestRatePerPeriod, int amortizationType, int interestType, int interestCalculationPeriodType,
