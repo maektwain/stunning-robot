@@ -18,10 +18,10 @@ spring:
         livereload:
             enabled: false
     datasource:
-        url: jdbc:mysql://localhost:3306/frontend?useUnicode=true&characterEncoding=utf8&useSSL=false
+        url: jdbc:mysql://192.168.99.100:4900/frontend?useUnicode=true&characterEncoding=utf8&useSSL=false
         name:
         username: root
-        password:
+        password: mysql
         hikari:
             data-source-properties:
                 cachePrepStmts: true
@@ -52,7 +52,7 @@ spring:
 multipart:
      maxFileSize: 10MB
      maxRequestSize: 50MB
-     
+
 liquibase:
     contexts: prod
 

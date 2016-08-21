@@ -83,10 +83,10 @@ public class AccountResource {
 
 	@Inject
 	private LoanService loanService;
-	
+
 	@Inject
 	private LoanProductsService loanProductsService;
-	
+
 	@Inject
 	private CollateralService collateralService;
 
@@ -279,7 +279,7 @@ public class AccountResource {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
 
 			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
-			
+
 			if (tenantData ==  null){
 	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
 	        }
@@ -320,7 +320,7 @@ public class AccountResource {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
-	
+
 	/***
 	 * POST /account/loan : create a loan for a tenant in mifos service
 	 *
@@ -358,14 +358,27 @@ public class AccountResource {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
-	
-	/**
-	 * GET /documents : get the current logged in user's document
-	 *
-	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
-	 *         body, or status 500 (Internal Server Error) if the user's document couldn't
-	 *         be returned
-	 */
+
+//    /**
+//     * GET /account/documents/check : checks the current users documents whether extracted or not
+//     *  This resource ensures t
+//     */
+//    @RequestMapping(value="/account/documents/check", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Timed
+//    public ResponseEntity<Object> getDocumentCheck(){
+//        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+//            List<Documents> doc = documentService.findAllByUser(u);
+//
+//        }).orElseGet()
+//    }
+
+    /**
+     * GET /documents : get the current logged in user's document
+     *
+     * @return the ResponseEntity with status 200 (OK) and the current user's document in
+     *         body, or status 500 (Internal Server Error) if the user's document couldn't
+     *         be returned
+     */
 	@RequestMapping(value = "/documents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<Object> getDocuments() {
@@ -413,7 +426,7 @@ public class AccountResource {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			/**
 			 *  Google vision api for extracting data from the document
 			 */
@@ -424,7 +437,7 @@ public class AccountResource {
 				document.setDocumentData(text.get(0).getDescription());
 				TextExtractionUtil data = new TextExtractionUtil();
 				String result = data.extractDocumentId(text.get(0).getDescription(), document.getDocumentType());
-				if(result.equals("documeny type not found"))
+				if(result.equals("document type not found"))
 					document.setDocumentId(null);
 				else
 					document.setDocumentId(result);
@@ -443,7 +456,8 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
-	/**
+
+    /**
 	 * POST /account/change_password : changes the current user's password
 	 *
 	 * @param password
