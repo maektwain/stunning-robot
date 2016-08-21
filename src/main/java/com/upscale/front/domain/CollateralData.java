@@ -20,7 +20,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Table(name = "collateral")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "collateral")
-public class Collateral extends AbstractAuditingEntity implements Serializable{
+public class CollateralData extends AbstractAuditingEntity implements Serializable{
 
 	
 	/**
@@ -105,7 +105,7 @@ public class Collateral extends AbstractAuditingEntity implements Serializable{
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Collateral collateral = (Collateral) o;
+		CollateralData collateral = (CollateralData) o;
 		if (collateral.id == null || id == null) {
 			return false;
 		}
@@ -119,7 +119,7 @@ public class Collateral extends AbstractAuditingEntity implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Collateral{" + "id=" + id + ", name='" + name + "'" + ", tenant='" + tenant + "'" + ", mifosCollateralId='"
+		return "CollateralData{" + "id=" + id + ", name='" + name + "'" + ", tenant='" + tenant + "'" + ", mifosCollateralId='"
 				+ mifosCollateralId + "'" + ", isActive='" + isActive + "'" + ", description='"
 				+ description + "'" + '}';
 	}

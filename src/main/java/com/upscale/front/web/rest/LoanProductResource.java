@@ -2,7 +2,7 @@ package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.upscale.front.domain.Collateral;
+import com.upscale.front.domain.CollateralData;
 import com.upscale.front.domain.LoanProducts;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.repository.TenantsRepository;
@@ -68,8 +68,8 @@ public class LoanProductResource {
             return new ResponseEntity<Object>("The Tenant Does Not Exist", textHttpHeaders, HttpStatus.NOT_FOUND);
         }
         try {
-            List<Collateral> collaterals = mifosBaseServices.retrieveCollateralList(tenant.get());
-            for (Collateral collateral: collaterals){
+            List<CollateralData> collaterals = mifosBaseServices.retrieveCollateralList(tenant.get());
+            for (CollateralData collateral: collaterals){
                 collateralService.save(collateral);
             }
         }catch (UnirestException e){
