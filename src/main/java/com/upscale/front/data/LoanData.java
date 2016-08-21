@@ -2,13 +2,6 @@ package com.upscale.front.data;
 
 import java.util.List;
 
-/**
- * 
- * @author Anurag Garg
- *
- */
-import java.math.BigDecimal;
-
 public class LoanData {
 
 	private Long clientId;
@@ -17,26 +10,85 @@ public class LoanData {
 	
 	private String principal;
 	
+	/**
+	 * Length of loan term
+	 */
 	private int loanTermFrequency;
 	
-	private int loanTermFrequencyType = 1;
+	/**
+	 * LoanTermFrequencyType
+	 * 
+	 * Values: 
+	 * 		days = 0
+	 * 		weeks = 1
+	 * 		months = 2
+	 * 		years = 3
+	 */
+	private int loanTermFrequencyType = 2;
 		
 	private String loanType = "individual";
 	
 	private int numberOfRepayments;
 	
+	/**
+	 * repayment every repaymentFrequencyType
+	 */
 	private int repaymentEvery = 1;
 	
+	/**
+	 * repaymentFrequencyType
+	 * 
+	 * Values: 
+	 * 		days = 0
+	 * 		weeks = 1
+	 * 		months = 2
+	 */
 	private int repaymentFrequencyType = 1;
 	
 	private String interestRatePerPeriod ;
 	
+	/**
+	 * amortizationType
+	 * 
+	 * Values: 
+	 * 		0 = Equal principle payments
+	 * 	 	1 = Equal installments
+	 */
 	private int amortizationType = 1;
 	
+	/**
+	 * interestType
+	 * 
+	 * values:
+	 * 		declining balance = 0
+	 * 		flat = 1
+	 */
 	private int interestType = 1;
 
+	/**
+	 * interestCalculationPeriodType
+	 * 
+	 * Values: 
+	 * 		0 = Daily
+	 * 	    1 = Same as repayment period
+	 */
 	private int interestCalculationPeriodType = 1;
 	
+	/**
+	 * transactionProcessingStrategyId 
+	 * 
+	 * An enumeration that indicates the type of transaction processing strategy to be used. 
+	 * This relates to functionality that is also known as Payment Application Logic.
+	 * 
+	 * List of current approaches:
+			1 = Mifos style (Similar to Old Mifos)
+			2 = Heavensfamily (Custom MFI approach)
+			3 = Creocore (Custom MFI approach)
+			4 = RBI (India)
+			5 = Principal Interest Penalties Fees Order
+			6 = Interest Principal Penalties Fees Order
+			7 = Early Payment Strategy
+	 */
 	private int transactionProcessingStrategyId = 1;
 	
 	private String expectedDisbursementDate;

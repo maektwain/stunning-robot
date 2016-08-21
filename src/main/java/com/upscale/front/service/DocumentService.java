@@ -42,9 +42,26 @@ public class DocumentService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<Documents> findAllByUser(User u) {
+	public Optional<List<Documents>> findAllByUser(User u) {
 		log.debug("Request to get all Documents by user: {}", u );
 		Optional<List<Documents>> result = documentsRepository.findAllByUserId(u.getId());
-		return result.get();
+		return result;
 	}
+	
+	@Transactional(readOnly = true)
+	public Optional<Documents> findByDocumentTypeAndUser(String documentType, User u) {
+		log.debug("Request to get Document by user: {}", u );
+		Optional<Documents> result = documentsRepository.findByDocumentTypeAndUser(documentType, u);
+		return result;
+	}
+	
+	 /**
+     *  Delete the documents by id.
+     *  
+     *  @param id the id of the entity
+     */
+    public void delete(Long id) {
+        log.debug("Request to delete Document : {}", id);
+        documentsRepository.delete(id);
+    }
 }

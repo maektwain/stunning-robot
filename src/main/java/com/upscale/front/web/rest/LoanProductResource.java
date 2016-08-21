@@ -118,8 +118,7 @@ public class LoanProductResource {
                 loanProductsService.save(products);
             }
         }catch (UnirestException e){
-            e.printStackTrace();
-        }
+            e.printStackTrace();       }
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityCreationAlert("loanproducts added for tenant", tenant.get().getTenant()))
             .body(null);
@@ -145,7 +144,4 @@ public class LoanProductResource {
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/loanproducts");
 		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 	}
-
-
-
 }

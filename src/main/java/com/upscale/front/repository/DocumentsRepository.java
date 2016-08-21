@@ -25,4 +25,6 @@ public interface DocumentsRepository extends JpaRepository<Documents, Long>{
 	public final Logger log = LoggerFactory.getLogger(DocumentsRepository.class);
 	
 	Optional<List<Documents>> findAllByUserId(Long userId);
+	
+	Optional<Documents> findByDocumentTypeAndUser(String documentType, User userId);
 }

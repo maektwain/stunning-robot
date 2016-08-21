@@ -41,6 +41,10 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
 	@Column(name = "auth_key")
 	private String authKey;
 
+	public Tenant() {
+		super();
+	}
+
 	public Tenant(Long id, String tenantName, String userName, String password, String authKey) {
 		super();
 		this.id = id;
