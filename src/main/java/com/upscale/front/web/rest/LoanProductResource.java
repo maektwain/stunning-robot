@@ -64,12 +64,10 @@ public class LoanProductResource {
             return new ResponseEntity<>("Please add TenantName", textHttpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Optional<Tenant> tenant = tenantRepository.findOneByTenantName(tenantName);
-
-        if (tenant ==  null){
+        if (!tenant.isPresent()){
             return new ResponseEntity<Object>("The Tenant Does Not Exist", textHttpHeaders, HttpStatus.NOT_FOUND);
         }
         try {
-
             List<Collateral> collaterals = mifosBaseServices.retrieveCollateralList(tenant.get());
             for (Collateral collateral: collaterals){
                 collateralService.save(collateral);
@@ -106,7 +104,7 @@ public class LoanProductResource {
 
         Optional<Tenant> tenant = tenantRepository.findOneByTenantName(tenantName);
 
-        if (tenant ==  null){
+        if (!tenant.isPresent()){
             return new ResponseEntity<Object>("The Tenant Does Not Exist", textHttpHeaders, HttpStatus.NOT_FOUND);
         }
         try {

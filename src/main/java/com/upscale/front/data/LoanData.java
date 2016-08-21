@@ -2,6 +2,13 @@ package com.upscale.front.data;
 
 import java.util.List;
 
+/**
+ * 
+ * @author Anurag Garg
+ *
+ */
+import java.math.BigDecimal;
+
 public class LoanData {
 
 	private Long clientId;

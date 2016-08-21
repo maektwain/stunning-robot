@@ -483,8 +483,7 @@ public class MifosBaseServices extends Unirest {
 			return post; 
 	}
 	
-	public ArrayList<Integer> uploadDocuments(Client client, Tenant tenant, List<Documents> documents) throws UnirestException, URISyntaxException, IOException {
-	
+	public ArrayList<Integer> uploadDocuments(Client client, Tenant tenant, List<Documents> documents) throws UnirestException, URISyntaxException, IOException {	
 		/**
 		 * Method which will get the Client Data along with tenant and user to upload documents 
 		 * and returns the status
@@ -527,6 +526,7 @@ public class MifosBaseServices extends Unirest {
 		}
 		
 		ArrayList<Integer> status = new ArrayList<>();
+
 		for(Documents doc: documents){
 			InputStream in = new ByteArrayInputStream(doc.getDocumentImage());
 			BufferedImage image = ImageIO.read(in);
