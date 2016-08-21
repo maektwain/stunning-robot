@@ -15,6 +15,14 @@ public class Collateral {
 	
 	private String description;
 
+	
+	/**
+	 * 
+	 */
+	public Collateral() {
+		super();
+	}
+
 	public Collateral(Long type, String value, String description) {
 		super();
 		this.type = type;

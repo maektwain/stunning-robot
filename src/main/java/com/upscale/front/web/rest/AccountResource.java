@@ -14,14 +14,19 @@ import com.upscale.front.service.DocumentService;
 import com.upscale.front.service.LoanProductsService;
 import com.upscale.front.data.Collateral;
 import com.upscale.front.data.LoanData;
+import com.upscale.front.data.LoanDetail;
 import com.upscale.front.domain.Client;
+import com.upscale.front.domain.CollateralData;
 import com.upscale.front.domain.Loan;
+import com.upscale.front.domain.LoanProducts;
+import com.upscale.front.domain.Products;
 import com.upscale.front.domain.Tenant;
 import com.upscale.front.service.ClientService;
 import com.upscale.front.service.CollateralService;
 import com.upscale.front.service.LoanService;
 import com.upscale.front.service.MailService;
 import com.upscale.front.service.MifosBaseServices;
+import com.upscale.front.service.ProductsService;
 import com.upscale.front.service.SMSService;
 import com.upscale.front.service.TextDetection;
 import com.upscale.front.service.UserService;
@@ -32,6 +37,7 @@ import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.LocalDate;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +54,10 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -97,7 +106,9 @@ public class AccountResource {
 	@Inject
 	private CollateralService collateralService;
 
-
+	@Inject
+	private ProductsService productsService;
+	
 	/**
 	 * POST /register : register the user.
 	 *
@@ -336,26 +347,40 @@ public class AccountResource {
 	 */
 	@RequestMapping(value = "/account/loan", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<String> createLoan(@RequestParam(value = "tenant") String tenant,
-			@RequestBody LoanData loanData) {
+	public ResponseEntity<String> createLoan(@RequestBody LoanDetail loanDetail) {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
-			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
+			LoanProducts loanProduct = loanProductsService.findOne(Long.parseLong(loanDetail.getLoanProductId()));
+			Products product = productsService.findOne(Long.parseLong(loanDetail.getProductId()));
+			Optional<Tenant> tenantData = tenantService.findOneByTenantName(loanProduct.getTenant().getTenant());
 			if (!tenantData.isPresent()) {
 				return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
 			}
+			CollateralData collateralType = collateralService.findCollateralByTenantAndName(tenantData.get(), product.getProductType());
 			Optional<Client> client = clientService.findOneByTenantAndUser(tenantData.get(), u);
 			if (client.isPresent()) {
 				Client clientData = client.get();
 				try {
+					LoanData loanData = new LoanData();
 					loanData.setClientId(clientData.getClientId());
-					List<Collateral> collateral = loanData.getCollateral();
-					collateral.get(0)
-							.setType(collateralService
-									.findCollateralByTenantAndName(tenantData.get(),
-											loanProductsService.findOne(loanData.getProductId()).getName())
-									.getMifosCollateralId());
-					loanData.setCollateral(collateral);
-					loanData.setProductId(loanProductsService.findOne(loanData.getProductId()).getMifosProductId());
+					loanData.setProductId(loanProduct.getMifosProductId());
+					loanData.setPrincipal(loanDetail.getPrincipal());
+					loanData.setLoanTermFrequency(Integer.parseInt(loanDetail.getTerm()));
+					loanData.setNumberOfRepayments(Integer.parseInt(loanDetail.getTerm()));
+					loanData.setInterestRatePerPeriod(loanProduct.getInterest().toString());
+					DateFormat df = new SimpleDateFormat("dd MMMM yyyy");
+					Date date = Calendar.getInstance().getTime();
+					loanData.setExpectedDisbursementDate(df.format(Calendar.getInstance().getTime()));
+					loanData.setSubmittedOnDate(df.format(Calendar.getInstance().getTime().getTime()));
+					loanData.setDateFormat("dd MMMM yyyy");
+					loanData.setLocale("en_GB");
+					Collateral collateral = new Collateral();
+						collateral.setType(collateralType.getMifosCollateralId());
+						collateral.setValue(product.getPrice().toString());
+						collateral.setDescription(product.getBrand() + "\n" + product.getName()
+								+ "\n" + product.getModel());
+					List<Collateral> collaterals = new ArrayList<>();
+						collaterals.add(collateral);
+					loanData.setCollateral(collaterals);
 					Loan loan = mifosBaseServices.createLoanAccount(loanData, tenantData.get(), u);
 					loanService.save(loan);
 				} catch (Exception e) {
