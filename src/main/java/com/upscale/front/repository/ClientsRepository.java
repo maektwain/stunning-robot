@@ -1,5 +1,6 @@
 package com.upscale.front.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -25,4 +26,6 @@ public interface ClientsRepository extends JpaRepository<Client	, Long> {
 	public final Logger log = LoggerFactory.getLogger(ClientsRepository.class);
 
 	Optional<Client> findOneByTenantAndUser(Tenant tenantId, User userId);
+	
+	List<Client> findByUser(User userId);
 }

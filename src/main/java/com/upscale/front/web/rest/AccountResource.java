@@ -1,10 +1,14 @@
 package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.api.client.json.Json;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
+import com.mashape.unirest.http.JsonNode;
+import com.mysql.fabric.xmlrpc.base.Array;
 import com.upscale.front.domain.Documents;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
+import com.upscale.front.security.AuthoritiesConstants;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.DocumentService;
 import com.upscale.front.service.LoanProductsService;
@@ -35,14 +39,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.expression.Arrays;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +61,7 @@ import java.util.Optional;
 public class AccountResource {
 
 	private final Logger log = LoggerFactory.getLogger(AccountResource.class);
-	
+
 	private static final int MAX_RESULTS = 2;
 
 	@Inject
@@ -71,22 +78,22 @@ public class AccountResource {
 
 	@Inject
 	private SMSService smsService;
-	
+
 	@Inject
 	private MifosBaseServices mifosBaseServices;
 
 	@Inject
 	private TenantService tenantService;
-	
+
 	@Inject
 	private ClientService clientService;
-	
+
 	@Inject
 	private LoanService loanService;
-	
+
 	@Inject
 	private LoanProductsService loanProductsService;
-	
+
 	@Inject
 	private CollateralService collateralService;
 
@@ -262,46 +269,45 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
-
 	/***
 	 * POST /account/client : create a client for a tenant in mifos service
 	 * 
 	 * @param tenant
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
-	 *         Request) if the client created successfully 
+	 *         Request) if the client created successfully
 	 */
-	@RequestMapping(value = "/account/client", 
-			method = RequestMethod.POST, 
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/account/client", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<String> createClient(@RequestParam(value = "tenant") String tenant){
+	public ResponseEntity<String> createClient(@RequestParam(value = "tenant") String tenant) {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
-			
+
 			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
-			
-			if (tenantData ==  null){
-	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
-	        }
+
+			if (!tenantData.isPresent()) {
+				return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+			}
 			try {
 				Client client = mifosBaseServices.createClient(u, tenantData.get());
 				clientService.save(client);
-				mifosBaseServices.uploadImage(client, tenantData.get(), u);
-				mifosBaseServices.uploadDocuments(client, tenantData.get(), u);
-				
+				if(u.getUserImage() != null)
+					mifosBaseServices.uploadImage(client, tenantData.get(), u);
+				Optional<List<Documents>> document = documentService.findAllByUser(u);
+				if (document.isPresent()) {
+					mifosBaseServices.uploadDocuments(client, tenantData.get(), document.get());
+				}
 			} catch (Exception e) {
-				System.out.println("Client Creation Failed");
 				e.printStackTrace();
+				return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
-	
-	
+
 	/**
 	 * POST /documents : upload the current user's image
 	 * 
 	 * @param file
-	 * 			image file 
+	 *            image file
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
 	 *         Request) if the image not in proper format
 	 */
@@ -319,101 +325,138 @@ public class AccountResource {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
-	
+
 	/***
 	 * POST /account/loan : create a loan for a tenant in mifos service
 	 * 
 	 * @param tenant
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
-	 *         Request) if the loan created successfully 
+	 *         Request) if the loan created successfully
 	 */
-	@RequestMapping(value = "/account/loan", 
-			method = RequestMethod.POST, 
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/account/loan", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
 	public ResponseEntity<String> createLoan(@RequestParam(value = "tenant") String tenant,
-			@RequestBody LoanData loanData){
+			@RequestBody LoanData loanData) {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
 			Optional<Tenant> tenantData = tenantService.findOneByTenantName(tenant);
-			if (tenantData ==  null){
-	            return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
-	        }
-			Client clientData = clientService.findOneByTenantAndUser(tenantData.get(), u);
-			if(clientData != null){
+			if (!tenantData.isPresent()) {
+				return new ResponseEntity<String>("The Tenant Does Not Exist", HttpStatus.NOT_FOUND);
+			}
+			Optional<Client> client = clientService.findOneByTenantAndUser(tenantData.get(), u);
+			if (client.isPresent()) {
+				Client clientData = client.get();
 				try {
 					loanData.setClientId(clientData.getClientId());
 					List<Collateral> collateral = loanData.getCollateral();
-					collateral.get(0).setType(collateralService.findCollateralByTenantAndName(tenantData.get(),
-							loanProductsService.findOne(loanData.getProductId()).getName()).getMifosCollateralId());
+					collateral.get(0)
+							.setType(collateralService
+									.findCollateralByTenantAndName(tenantData.get(),
+											loanProductsService.findOne(loanData.getProductId()).getName())
+									.getMifosCollateralId());
 					loanData.setCollateral(collateral);
 					loanData.setProductId(loanProductsService.findOne(loanData.getProductId()).getMifosProductId());
 					Loan loan = mifosBaseServices.createLoanAccount(loanData, tenantData.get(), u);
 					loanService.save(loan);
 				} catch (Exception e) {
-					System.out.println("Loan Creation Failed");
 					e.printStackTrace();
+					return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			}
 			return new ResponseEntity<String>(HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
-	
+
 	/**
-	 * GET /documents : get the current logged in user's document
+	 * GET /account/loans : get the current logged in user's loans details
 	 * 
-	 * @return the ResponseEntity with status 200 (OK) and the current user's document in
-	 *         body, or status 500 (Internal Server Error) if the user's document couldn't
-	 *         be returned
+	 * @return the ResponseEntity with status 200 (OK) and the current user's
+	 *         loans details in the body , or status 500 (Internal Server Error)
+	 *         if the user's loan details couldn't be returned
 	 */
-	@RequestMapping(value = "/documents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/account/loans", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
-	public ResponseEntity<Object> getDocuments() {
+	public ResponseEntity<List<JsonNode>> retrieveLoans() {
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
-			List<Documents> doc = documentService.findAllByUser(u);
-			List<JSONObject> entities = new ArrayList<JSONObject>();
-			
-			for (Documents n : doc) {
-				JSONObject entity = new JSONObject();
-				entity.put("id", n.getId());
-				entity.put("documentType", n.getDocumentType());
-				entity.put("documentName", n.getDocumentName());
-				entity.put("documentData", StringUtils.split(n.getDocumentData(),"\n"));
-				entity.put("documentId", n.getDocumentId());
-				entity.put("documentImage", n.getDocumentImage());
-				entity.put("contentType", n.getContentType());
-				entities.add(entity);
+			Optional<List<Loan>> loans = loanService.findByUser(u);
+			if(!loans.isPresent())
+				return new ResponseEntity<List<JsonNode>>(HttpStatus.NOT_FOUND);
+			List<JsonNode> result = new ArrayList<>();
+			for (Loan loan : loans.get()) {
+				try {
+					result.add(mifosBaseServices.retrieveLoanDetails(loan));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			return new ResponseEntity<Object>(entities, HttpStatus.OK);
+			return new ResponseEntity<List<JsonNode>>(result, HttpStatus.OK);
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
 	/**
-	 * POST /documents : upload the current user's documents
+	 * GET /account/documents : get the current logged in user's document
 	 * 
-	 * @param document 
-	 * 			the document model
+	 * @return the ResponseEntity with status 200 (OK) and the current user's
+	 *         document in body, or status 500 (Internal Server Error) if the
+	 *         user's document couldn't be returned
+	 */
+	@RequestMapping(value = "/account/documents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Object> getDocuments() {
+		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			Optional<List<Documents>> document = documentService.findAllByUser(u);
+			if (document.isPresent()) {
+				List<JSONObject> entities = new ArrayList<JSONObject>();
+				for (Documents n : document.get()) {
+					JSONObject entity = new JSONObject();
+					entity.put("id", n.getId());
+					entity.put("documentType", n.getDocumentType());
+					entity.put("documentName", n.getDocumentName());
+					entity.put("documentData", StringUtils.split(n.getDocumentData(), "\n"));
+					entity.put("documentId", n.getDocumentId());
+					entity.put("documentImage", n.getDocumentImage());
+					entity.put("contentType", n.getContentType());
+					entities.add(entity);
+				}
+				return new ResponseEntity<Object>(entities, HttpStatus.OK);
+			} else
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+	}
+
+	/**
+	 * POST /account/documents : upload the current user's documents
+	 * 
+	 * @param document
+	 *            the document model
 	 * @param file
-	 * 			document file 
+	 *            document file
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
 	 *         Request) if the documents not in proper format
 	 */
-	@RequestMapping(value = "/documents", method = RequestMethod.POST)
+	@RequestMapping(value = "/account/documents", method = RequestMethod.POST)
 	@Timed
-	public ResponseEntity<String> uploadDocuments(@ModelAttribute("documents") Documents document,
-			@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<String> uploadDocuments(@RequestParam("documentType") String documentType,
+			@RequestParam("file") MultipartFile file) throws NullPointerException {
 
 		return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+
+			Documents document = new Documents();
+			Optional<Documents> doc = documentService.findByDocumentTypeAndUser(documentType, u);
+			if (doc.isPresent())
+				document = doc.get();
+
 			document.setDocumentName(file.getOriginalFilename());
 			document.setContentType(file.getContentType());
-			document.setUser(u);
+			document.setDocumentType(documentType);
 			try {
 				document.setDocumentImage(file.getBytes());
 			} catch (Exception e) {
 				e.printStackTrace();
+				return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			
+
 			/**
-			 *  Google vision api for extracting data from the document
+			 * Google vision api for extracting data from the document
 			 */
 			try {
 				TextDetection app = new TextDetection(TextDetection.getVisionService());
@@ -421,26 +464,57 @@ public class AccountResource {
 				System.out.printf("Found %d text%s\n", text.size(), text.size() == 1 ? "" : "s");
 				document.setDocumentData(text.get(0).getDescription());
 				TextExtractionUtil data = new TextExtractionUtil();
+
+				/**
+				 * extract document ID number
+				 */
 				String result = data.extractDocumentId(text.get(0).getDescription(), document.getDocumentType());
-				if(result.equals("documeny type not found"))
-					document.setDocumentId(null);
-				else
+				if (result != null)
 					document.setDocumentId(result);
-				u.setAddress(data.extractAddress(text.get(0).getDescription(), document.getDocumentType()));
-				u.setFatherName(data.extractFatherName(text.get(0).getDescription(), document.getDocumentType()));
-				u.setBirthDate(data.extractDOB(text.get(0).getDescription(), document.getDocumentType()));
+				else
+					throw new NullPointerException();
+				// u.setAddress(data.extractAddress(text.get(0).getDescription(),
+				// document.getDocumentType()));
+				// u.setFatherName(data.extractFatherName(text.get(0).getDescription(),
+				// document.getDocumentType()));
+				Date date = data.extractDOB(text.get(0).getDescription(), document.getDocumentType());
+				if (date != null)
+					u.setBirthDate(date);
+				else
+					throw new NullPointerException();
 			} catch (Exception e) {
-				System.out.println("Google vision api credential error");
 				e.printStackTrace();
+				return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			
 			userRepository.save(u);
 			document.setUser(u);
 			documentService.save(document);
 			return new ResponseEntity<String>(HttpStatus.OK);
-		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+		}).orElseGet(() -> new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
+	
+	/**
+     * DELETE  /account/documents : delete the document by type.
+     *
+     * @param document type of the document to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @RequestMapping(value = "/account/documents",
+        method = RequestMethod.DELETE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<String> deleteProducts(@RequestParam("documentType") String documentType ) {
+    	return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u -> {
+			Optional<Documents> document = documentService.findByDocumentTypeAndUser(documentType, u);
+			if (document.isPresent()) {
+					documentService.delete(document.get().getId());
+				return new ResponseEntity<String>(HttpStatus.OK);
+			}else
+				return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+			
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
 	/**
 	 * POST /account/change_password : changes the current user's password
 	 *

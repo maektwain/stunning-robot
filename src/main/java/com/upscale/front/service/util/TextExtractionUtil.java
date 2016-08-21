@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -14,12 +16,26 @@ public class TextExtractionUtil {
 	public String extractDocumentId(String text, String type){
 		
 		if(type.equals("PANCARD")){
+			Pattern pattern = Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]{1}");
+			String result = null;
 			String[] data = StringUtils.split(text, "\n");
-			return data[6];
+			for(String str: data){
+				Matcher matcher = pattern.matcher(str);
+				if(matcher.matches())
+					result = str;
+			}
+			return result;
 		}
 		else if(type.equals("VOTERID CARD")){
+			Pattern pattern = Pattern.compile("[A-Z]{3}[0-9]{7}");
+			String result = null;
 			String[] data = StringUtils.split(text, "\n");
-			return data[2].replaceAll("\\s+", "");
+			for(String str: data){
+				Matcher matcher = pattern.matcher(str);
+				if(matcher.matches())
+					result = str;
+			}
+			return result;
 		}
 		else
 			return "documeny type not found";
@@ -50,11 +66,19 @@ public class TextExtractionUtil {
 	public Date extractDOB(String text, String type){
 		
 		if(type.equals("PANCARD")){
-			String[] data =StringUtils.split(text, "\n");
+			Pattern pattern = Pattern.compile("(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\\d\\d");
+			String result = null;
+			String[] data = StringUtils.split(text, "\n");
+			for(String str: data){
+				Matcher matcher = pattern.matcher(str);
+				if(matcher.matches())
+					result = str;
+			}
+			
 			DateFormat df = new SimpleDateFormat("dd/MM/yyyy"); 
 		    Date dob = new Date();
 		    try {
-		        dob = df.parse(data[4]);
+		        dob = df.parse(result);
 		    } catch (ParseException e) {
 		        e.printStackTrace();
 		    }
@@ -63,5 +87,5 @@ public class TextExtractionUtil {
 		else
 			return null;
 			
-	}
+	}	
 }
