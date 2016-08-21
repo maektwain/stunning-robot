@@ -1,5 +1,6 @@
 package com.upscale.front.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -35,12 +36,18 @@ public class ClientService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Client findOneByTenantAndUser(Tenant tenantId, User userId) {
+	public Optional<Client> findOneByTenantAndUser(Tenant tenantId, User userId) {
 		log.debug("Request to get client : {}", tenantId, userId);
 		Optional<Client> client = clientsRepository.findOneByTenantAndUser(tenantId, userId);
-		return client.get();
+		return client;
 		
 	}
 	
+	@Transactional(readOnly = true)
+	public List<Client> findByUser(User userId) {
+		log.debug("Request to get client list based on userId : {}", userId);
+		List<Client> client = clientsRepository.findByUser(userId);
+		return client;
+	}
 
 }

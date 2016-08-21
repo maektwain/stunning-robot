@@ -2,7 +2,6 @@ package com.upscale.front.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -43,7 +42,9 @@ public class Tenant extends AbstractAuditingEntity implements Serializable{
 	@Column(name = "auth_key")
 	private String authKey;
 
-    public Tenant(){}
+	public Tenant() {
+		super();
+	}
 
 	public Tenant(Long id, String tenantName, String userName, String password, String authKey) {
 		super();
