@@ -25,7 +25,7 @@ public final class Constants {
     // File download path
     public static final String FILE_TEMP_DOWNLOAD = "/home/vcap/temp";
     // Mifos URL
-    public static final String MIFOS_URL = "https://localhost:8443/fineract-provider/api/v1";
+    public static final String MIFOS_URL = "https://ec2-52-88-126-139.us-west-2.compute.amazonaws.com:8443/fineract-provider/api/v1";
     
     public static final String SYSTEM_ACCOUNT = "system";
 
