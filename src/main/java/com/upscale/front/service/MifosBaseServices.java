@@ -8,6 +8,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.upscale.front.config.Constants;
 import com.upscale.front.data.ClientData;
 import com.upscale.front.domain.Client;
 import com.upscale.front.domain.CollateralData;
@@ -67,7 +68,7 @@ public class MifosBaseServices extends Unirest {
 
 	Logger log = LoggerFactory.getLogger(MifosBaseServices.class);
 
-	private static final String URL = "https://localhost:8443/fineract-provider/api/v1";
+	private static final String URL = Constants.MIFOS_URL;
 	
 	@Inject
 	private TenantsRepository tenantsRepository;
@@ -124,7 +125,8 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -396,7 +398,8 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -457,7 +460,8 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -471,11 +475,11 @@ public class MifosBaseServices extends Unirest {
 		InputStream in = new ByteArrayInputStream(user.getUserImage());
 		BufferedImage image = ImageIO.read(in);
 		String fileName = LocalDateTime.now().toString().replace(":", "") + ".jpg";
-		ImageIO.write(image, "jpg", new File("D:\\" + fileName));
+		ImageIO.write(image, "jpg", new File(Constants.FILE_TEMP_DOWNLOAD + fileName));
 		HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/images?tenantIdentifier=" + tenant.getTenant())
 				.header("accept", "application/json")
 				.header("Authorization", "Basic " + tenant.getAuthKey())
-				.field("file", new File("D:\\" + fileName), "image/jpeg")
+				.field("file", new File(Constants.FILE_TEMP_DOWNLOAD + fileName), "image/jpeg")
 				.asString();	
 
 			log.debug("String", post.getStatus());
@@ -514,7 +518,8 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -531,13 +536,13 @@ public class MifosBaseServices extends Unirest {
 			InputStream in = new ByteArrayInputStream(doc.getDocumentImage());
 			BufferedImage image = ImageIO.read(in);
 			String fileName = LocalDateTime.now().toString().replace(":", "") + ".jpg";
-			ImageIO.write(image, "jpg", new File("D:\\" + fileName));
+			ImageIO.write(image, "jpg", new File(Constants.FILE_TEMP_DOWNLOAD + fileName));
 			HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/documents?tenantIdentifier=" + tenant.getTenant())
 				.header("accept", "application/json")
 				.header("Authorization", "Basic " + tenant.getAuthKey())
 				.field("description", doc.getDocumentData())
 				.field("name", doc.getDocumentName())
-				.field("file", new File("D:\\" + fileName ), "image/jpeg")
+				.field("file", new File(Constants.FILE_TEMP_DOWNLOAD+ fileName ), "image/jpeg")
 				.asString();	
 			log.debug("String", post.getStatus());
 			log.debug("String ", post);

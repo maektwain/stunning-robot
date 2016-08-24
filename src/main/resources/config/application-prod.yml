@@ -21,7 +21,7 @@ spring:
         url: jdbc:mysql://localhost:3306/frontend?useUnicode=true&characterEncoding=utf8&useSSL=false
         name:
         username: root
-        password:
+        password: mysql
         hikari:
             data-source-properties:
                 cachePrepStmts: true

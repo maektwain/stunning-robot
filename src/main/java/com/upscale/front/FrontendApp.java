@@ -3,6 +3,7 @@ package com.upscale.front;
 import com.upscale.front.config.Constants;
 import com.upscale.front.config.DefaultProfileUtil;
 import com.upscale.front.config.JHipsterProperties;
+import com.upscale.front.service.util.DownloadCredentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -38,9 +41,10 @@ public class FrontendApp {
      * Spring profiles can be configured with a program arguments --spring.profiles.active=your-active-profile
      * <p>
      * You can find more information on how profiles work with JHipster on <a href="http://jhipster.github.io/profiles/">http://jhipster.github.io/profiles/</a>.
+     * @throws IOException 
      */
     @PostConstruct
-    public void initApplication() {
+    public void initApplication() throws IOException {
         log.info("Running with Spring profile(s) : {}", Arrays.toString(env.getActiveProfiles()));
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
         if (activeProfiles.contains(Constants.SPRING_PROFILE_DEVELOPMENT) && activeProfiles.contains(Constants.SPRING_PROFILE_PRODUCTION)) {
@@ -50,6 +54,11 @@ public class FrontendApp {
         if (activeProfiles.contains(Constants.SPRING_PROFILE_DEVELOPMENT) && activeProfiles.contains(Constants.SPRING_PROFILE_CLOUD)) {
             log.error("You have misconfigured your application! It should not" +
                 "run with both the 'dev' and 'cloud' profiles at the same time.");
+        }
+        if(activeProfiles.contains(Constants.SPRING_PROFILE_CLOUD)){
+        	log.info("Google credentials downloaded");
+        	DownloadCredentials download = new DownloadCredentials();
+        	download.downloadFile(Constants.GOOGLE_CREDENTIALS_URL, Constants.GOOGLE_CREDENTIALS_DOWNLOAD_PATH);
         }
     }
 
