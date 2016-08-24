@@ -39,7 +39,7 @@ public class UserServiceIntTest {
 
     @Inject
     private DocumentService documentService;
-    
+
     @Inject
     private SMSService smsService;
 
@@ -122,5 +122,10 @@ public class UserServiceIntTest {
         ZonedDateTime now = ZonedDateTime.now();
         List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
         assertThat(users).isEmpty();
+    }
+
+    @Test
+    public void testImageAsyncHappening(){
+
     }
 }

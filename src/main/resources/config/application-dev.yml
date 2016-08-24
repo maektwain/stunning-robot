@@ -18,7 +18,7 @@ spring:
         livereload:
             enabled: false # we use gulp + BrowserSync for livereload
     datasource:
-        url: jdbc:mysql://localhost:3306/frontend?useUnicode=true&characterEncoding=utf8&useSSL=false
+        url: jdbc:mysql://192.168.99.100:4900/frontend?useUnicode=true&characterEncoding=utf8&useSSL=false
         name:
         username: root
         password: mysql
@@ -54,6 +54,10 @@ spring:
         cache-seconds: 1
     thymeleaf:
         cache: false
+
+multipart:
+     maxFileSize: 10MB
+     maxRequestSize: 50MB
 
 liquibase:
     contexts: dev

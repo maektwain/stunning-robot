@@ -13,16 +13,12 @@ import com.upscale.front.domain.Client;
 import com.upscale.front.domain.CollateralData;
 import com.upscale.front.domain.Documents;
 import com.upscale.front.data.LoanData;
-import com.upscale.front.domain.Loan;
-import com.upscale.front.domain.LoanProducts;
-import com.upscale.front.domain.Tenant;
-import com.upscale.front.domain.User;
+import com.upscale.front.domain.*;
 import com.upscale.front.repository.DocumentsRepository;
 import com.upscale.front.repository.TenantsRepository;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
@@ -35,11 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -49,17 +43,15 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by saransh on 20/07/16.
- * 
- * Updated by Anurag 
+ *
+ * Updated by Anurag
  */
 @Service
 @Transactional
@@ -68,13 +60,13 @@ public class MifosBaseServices extends Unirest {
 	Logger log = LoggerFactory.getLogger(MifosBaseServices.class);
 
 	private static final String URL = "https://localhost:8443/fineract-provider/api/v1";
-	
+
 	@Inject
 	private TenantsRepository tenantsRepository;
-	
+
 	@Inject
 	private DocumentsRepository documentsRepository;
-	
+
 	// Getting Values For this method like Url , and Objects or Values which are
 	// being sent , like officeId, firstName, lastName, externalId,
 
@@ -84,7 +76,7 @@ public class MifosBaseServices extends Unirest {
 		 * Method which will get the User and Tenant Data To Send For client Creation
 		 * and returns the client id from mifos service
 		 */
-		
+
 		ClientData client = new ClientData();
 		client.setFirstname(user.getFirstName());
 		client.setLastname(user.getLastName());
@@ -124,7 +116,7 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -203,7 +195,7 @@ public class MifosBaseServices extends Unirest {
 				.header("accept", "application/json")
 				.header("Content-Type", "application/json").header("Authorization", "Basic " + tenant.getAuthKey())
 				.asJson();
-		
+
 		log.debug("String", result.getStatus());
 		log.debug("String ", result);
 		JSONArray obj = result.getBody().getArray();
@@ -230,7 +222,7 @@ public class MifosBaseServices extends Unirest {
 		}
 		return loanProductList;
 	}
-	
+
 	public List<CollateralData> retrieveCollateralList(Tenant tenant) throws UnirestException {
 
 		/**
@@ -299,8 +291,8 @@ public class MifosBaseServices extends Unirest {
 		}
 		return collateralList;
 	}
-	
-	
+
+
 	public JsonNode retrieveLoanDetails(Loan loan) throws UnirestException {
 
 		/**
@@ -396,7 +388,7 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -421,11 +413,12 @@ public class MifosBaseServices extends Unirest {
 		result.setUser(user);
 		return result;
 	}
-	
+
 	public HttpResponse<String> uploadImage(Client client, Tenant tenant, User user) throws UnirestException, URISyntaxException, IOException {
 		/**
-		 * Method which will get the Client Data along with tenant and user to upload image 
+		 * Method which will get the Client Data along with tenant and user to upload image
 		 * and returns the status
+         *
 		 */
 
 		if (user.getUserImage() == null) {
@@ -457,7 +450,7 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -467,25 +460,25 @@ public class MifosBaseServices extends Unirest {
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}
-		
+
 		InputStream in = new ByteArrayInputStream(user.getUserImage());
 		BufferedImage image = ImageIO.read(in);
 		String fileName = LocalDateTime.now().toString().replace(":", "") + ".jpg";
-		ImageIO.write(image, "jpg", new File("D:\\" + fileName));
+		ImageIO.write(image, "jpg", new File("/home/vcap/tmp/" + fileName));
 		HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/images?tenantIdentifier=" + tenant.getTenant())
 				.header("accept", "application/json")
 				.header("Authorization", "Basic " + tenant.getAuthKey())
-				.field("file", new File("D:\\" + fileName), "image/jpeg")
-				.asString();	
+				.field("file", new File("/home/vcap/tmp/" + fileName), "image/jpeg")
+				.asString();
 
 			log.debug("String", post.getStatus());
 			log.debug("String ", post);
-			return post; 
+			return post;
 	}
-	
-	public ArrayList<Integer> uploadDocuments(Client client, Tenant tenant, List<Documents> documents) throws UnirestException, URISyntaxException, IOException {	
+
+	public ArrayList<Integer> uploadDocuments(Client client, Tenant tenant, List<Documents> documents) throws UnirestException, URISyntaxException, IOException {
 		/**
-		 * Method which will get the Client Data along with tenant and user to upload documents 
+		 * Method which will get the Client Data along with tenant and user to upload documents
 		 * and returns the status
 		 */
 
@@ -514,7 +507,7 @@ public class MifosBaseServices extends Unirest {
 		SSLContext sslcontext;
 		try {
 			sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			Unirest.setHttpClient(httpclient);
 		} catch (KeyManagementException e) {
@@ -524,26 +517,26 @@ public class MifosBaseServices extends Unirest {
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}
-		
+
 		ArrayList<Integer> status = new ArrayList<>();
 
 		for(Documents doc: documents){
 			InputStream in = new ByteArrayInputStream(doc.getDocumentImage());
 			BufferedImage image = ImageIO.read(in);
 			String fileName = LocalDateTime.now().toString().replace(":", "") + ".jpg";
-			ImageIO.write(image, "jpg", new File("D:\\" + fileName));
+			ImageIO.write(image, "jpg", new File("/home/vcap/tmp/" + fileName));
 			HttpResponse<String> post = Unirest.post(URL + "/clients/" + client.getClientId() + "/documents?tenantIdentifier=" + tenant.getTenant())
 				.header("accept", "application/json")
 				.header("Authorization", "Basic " + tenant.getAuthKey())
 				.field("description", doc.getDocumentData())
 				.field("name", doc.getDocumentName())
 				.field("file", new File("D:\\" + fileName ), "image/jpeg")
-				.asString();	
+				.asString();
 			log.debug("String", post.getStatus());
 			log.debug("String ", post);
 			status.add(post.getStatus());
 		}
-		
+
 		return status;
 	}
 }

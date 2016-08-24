@@ -283,7 +283,7 @@ public class AccountResource {
 
 	/***
 	 * POST /account/client : create a client for a tenant in mifos service
-	 * 
+	 *
 	 * @param tenant
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
 	 *         Request) if the client created successfully
@@ -317,7 +317,7 @@ public class AccountResource {
 
 	/**
 	 * POST /documents : upload the current user's image
-	 * 
+	 *
 	 * @param file
 	 *            image file
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
@@ -340,7 +340,7 @@ public class AccountResource {
 
 	/***
 	 * POST /account/loan : create a loan for a tenant in mifos service
-	 * 
+	 *
 	 * @param tenant
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
 	 *         Request) if the loan created successfully

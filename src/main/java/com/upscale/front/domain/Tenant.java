@@ -2,13 +2,14 @@ package com.upscale.front.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * 
+ *
  * @author Anurag Garg
  *
  */
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "jhi_tenant")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Document(indexName="tenant")
 public class Tenant extends AbstractAuditingEntity implements Serializable{
 
 

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "upscale-lending",
+  "private_key_id": "3db8973f445e88facc750b6efae13b493fef0eae",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCU9rgbqWF09ltX\nFRIYYwfmQvn44UUawzNAle6Jx2m3GofpJM3rhU699AlzFyTbTvb+/6w6EJb9d1Ta\nK0Zu5d1C4vbz6Ettea3IGS8rajJ8hvEFXm5dotkeh/rhctaXCY8N6SJQSk2g7BMW\nCOZZGvLblywjHG/nfr2yzdD2NJQs1OeFWgVVxCoA+LkkUza/C9DcGCrUkNUTKN+y\n2OQ3B9gm3HSdZ0CYQsw9NNA9l4gaAXSa06Dlxmkx66vSABRZwYaJgt1T7Xe0N69q\nXkIERH0AW/5MG5+U1Vn5UZoPU4uHABgSPRHvBbBHYYOIa/fY0CbXFqh1IZm46cJe\nlvKbgqdbAgMBAAECggEAZ2XBcWHmxbrit9VmVAsZRpkizb//qY3om2H2yyfhlzkR\nMaFcVaiYeX1UudBMwvVSuLlbIIq3Y4RbH3x+TSe8p1rHM5IAGSMmnwfsF+SE2q8H\nyUQ8sz4AGxMj7y05CmmWJH+4U6bfr11t+hN/YEY2YHnUJyLsAfGVVvFJpDvmxh6K\n2/1qpxKDAZHhBWXRAuuLO0CEnW765o1kGLRIAylJfE9xlesykNLUe1ZiyOFNf1Ym\ne7hPloWd5dA1GWBXQ4fCd7duK/S3TrGA1lqfl10EgUBIn1MIfXglFwrk75fNx27k\n/paM0nO5k+j1wK7tUkhn7R3RtursMhKLtYVPcaLFcQKBgQDGX5Du3oSiI1MFCgG8\n8aRmiG1ffBFy05ECBD3cam5Jza5SqS+IBAYlvfDcn+NVTeBOVX5Q6H6GfhkCc0Vt\nSuCcKBdkpcnchOBhUzQoyhD0eb5TNs99M9hFArX7eTx4brvpnYa12YLq0Rg2u5zb\nybXaRdimj7mwzetE8bq+RqFbBQKBgQDAPLX5B9lD7chD1gczReNSvh7WHgGpPNtH\n9AxVLpd7QCHR6/OxFTyE6/9LSX3pkTufbxuwixE6U9lac2WX4CQhubTSgvhmy5H4\nSvEGDGxCpuQ0mgg7iu7ojgZDR/xqHPp9urYMQaDSlnNimnjLFQZGXlBTg8wKkMG/\nKqa21J1G3wKBgQCQ5neYdAOP55uZv7B7UkrS9m5l49te87klLvH80eVTlaDzEk/8\n22ueH/sTPNsykVr5/SrycJETLoKYLpkU9y/QANztkMg9gvXfQYaFEOyHl3H1mMDA\n5KDh79P8J5eLJN+wCne+123wleFJAYvXY6SpFoHlUHDD+/YRezz8Bd2Q/QKBgAq3\nF5mS82xS47fMRUh5W8tv534d3A/X4Y0oMEvLNgxbrcbqtQGo4l+yW9+RcCBFxSIE\n6nEzvzkWFWZySjZl+v2aQVb+j+QC8tb5Lmgc5yfr74pzD4RqIRj7WaQEbjBn/xpk\n/uK+Ab3bPwE/BP6k5F2lwip1jTkFipciRHqqbT3XAoGADIEJGu0IdPEo3m+eGbAQ\n4D8ZzwbRKIs8qpT3urb1j8W8mCM/+2N36GtAJSwDd30sRqhZieqcNWyAcrdGGdZG\nE6QC9rBPsDJLC4OO6oqVBqLr2flxpmNOdMieEnnYQRFd3OpJnnMRQrmK0duPK/S9\nUi3Bfa77fCdFUljTKF3LhVA=\n-----END PRIVATE KEY-----\n",
+  "client_email": "vision-api@upscale-lending.iam.gserviceaccount.com",
+  "client_id": "109104976192428125502",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vision-api%40upscale-lending.iam.gserviceaccount.com"
+}
