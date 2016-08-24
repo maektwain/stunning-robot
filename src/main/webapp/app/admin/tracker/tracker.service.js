@@ -29,7 +29,7 @@
         function connect () {
             //building absolute path so that websocket doesnt fail when deploying with a context path
             var loc = $window.location;
-            var url = '//' + loc.host + loc.pathname + 'websocket/tracker';
+            var url = '//' + loc.host+":4443" + loc.pathname + 'websocket/tracker';
             /*jshint camelcase: false */
             var authToken = angular.fromJson($localStorage.authenticationToken).access_token;
             url += '?access_token=' + authToken;
@@ -37,6 +37,7 @@
             stompClient = Stomp.over(socket);
             var stateChangeStart;
             var headers = {};
+            headers['X-CSRF-TOKEN'] = $cookies[$http.defaults.xsrfCookieName];
             stompClient.connect(headers, function() {
                 connected.resolve('success');
                 sendActivity();

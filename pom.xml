@@ -20,6 +20,14 @@
 		<maven>3.0.0</maven>
 	</prerequisites>
 
+    <repositories>
+        <repository>
+            <id>sonatype</id>
+            <name>Sonatype Groups</name>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
 	<properties>
 		<hikaricp.version>2.4.6</hikaricp.version>
 		<assertj-core.version>3.3.0</assertj-core.version>
@@ -69,9 +77,8 @@
 		<!-- These remain empty unless the corresponding profile is active -->
 		<profile.no-liquibase></profile.no-liquibase>
 		<profile.no-swagger></profile.no-swagger>
+
 	</properties>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
@@ -225,6 +232,11 @@
 			<version>${awaitility.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>io.searchbox</groupId>
+            <artifactId>jest</artifactId>
+            <version>2.0.0</version>
+        </dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
@@ -305,7 +317,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<version>${assertj-core.version}</version>
@@ -442,7 +454,13 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-cloudfoundry-connector</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>com.nexmo</groupId>
+            <artifactId>message</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-spring-service-connector</artifactId>
 		</dependency>
@@ -507,7 +525,7 @@
 					<simulationClass>*</simulationClass>
 				</configuration>
 			</plugin>
-			<plugin>
+            <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<configuration>

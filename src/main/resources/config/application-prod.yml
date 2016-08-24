@@ -37,10 +37,9 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
-    data:
-        elasticsearch:
-            cluster-name:
-            cluster-nodes: localhost:9300
+
+    elasticsearch:
+            jest.uris: https://search-upscale-apvme3izgx3wxq264ebfbsrjdm.us-east-1.es.amazonaws.com
     mail:
         host: localhost
         port: 25
@@ -107,4 +106,4 @@ jhipster:
             port: 5000
             queueSize: 512
     swagger: # swagger is disabled. It can be disabled by pasing 'no-swagger' profile at run time as well
-        enabled: false
+        enabled: true

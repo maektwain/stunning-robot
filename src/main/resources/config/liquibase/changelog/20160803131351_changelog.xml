@@ -37,7 +37,7 @@
          </column>
          <column name="last_modified_by" type="VARCHAR(50)"/>
          <column name="last_modified_date" type="datetime"/>
-         <column name="document_image" type="VARCHAR(255)">
+         <column name="document_image" type="BLOB">
             <constraints nullable="false"/>
          </column>
           <column name="content_type" type="VARCHAR(50)"/>

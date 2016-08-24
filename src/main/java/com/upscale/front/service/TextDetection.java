@@ -25,18 +25,20 @@ import com.google.api.services.vision.v1.model.Image;
 import com.google.common.collect.ImmutableList;
 
 /**
- * 
+ *
  * @author Anurag Garg
  *
  */
 @Service
 @Transactional
 public class TextDetection {
-	
+
 	private final Logger log = LoggerFactory.getLogger(TextDetection.class);
-	
+
+
 	private static final String APPLICATION_NAME = "Upscale-Finocial/1.0";
-	
+
+
 	public static Vision getVisionService() throws IOException, GeneralSecurityException {
 		GoogleCredential credential = GoogleCredential.getApplicationDefault().createScoped(VisionScopes.all());
 		JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
@@ -44,9 +46,9 @@ public class TextDetection {
 				.setApplicationName(APPLICATION_NAME)
 				.build();
 	}
-	
+
 	private final Vision vision;
-	
+
 	/**
 	 * Constructs a {@link TextDetection} which connects to the vision api.
 	 * @param vision
@@ -54,7 +56,7 @@ public class TextDetection {
 	public TextDetection(){
 		this.vision = null;
 	}
-	
+
 	public TextDetection(Vision vision) {
 		this.vision = vision;
 	}
@@ -62,9 +64,9 @@ public class TextDetection {
 	/**
 	 * Gets up to {@code maxResults} texts for an image stored at {@code byte[]}.
 	 */
-	
+
 	public List<EntityAnnotation> detectText(byte[] data, int maxResults) throws IOException {
-		
+
 		AnnotateImageRequest request =
 				new AnnotateImageRequest()
 					.setImage(new Image().encodeContent(data))
@@ -72,12 +74,12 @@ public class TextDetection {
 							new Feature()
 								.setType("TEXT_DETECTION")
 								.setMaxResults(maxResults)));
-		
+
 		Vision.Images.Annotate annotate =
 				vision.images()
 					.annotate(new BatchAnnotateImagesRequest().setRequests(ImmutableList.of(request)));
 		annotate.setDisableGZipContent(true);
-		
+
 		BatchAnnotateImagesResponse batchResponse = annotate.execute();
 		assert batchResponse.getResponses().size() == 1;
 		AnnotateImageResponse response = batchResponse.getResponses().get(0);
