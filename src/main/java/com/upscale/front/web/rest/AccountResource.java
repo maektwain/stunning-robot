@@ -1,43 +1,21 @@
 package com.upscale.front.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.api.client.json.Json;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.mashape.unirest.http.JsonNode;
-import com.mysql.fabric.xmlrpc.base.Array;
-import com.upscale.front.domain.Documents;
-import com.upscale.front.domain.User;
-import com.upscale.front.repository.UserRepository;
-import com.upscale.front.security.AuthoritiesConstants;
-import com.upscale.front.security.SecurityUtils;
-import com.upscale.front.service.DocumentService;
-import com.upscale.front.service.LoanProductsService;
 import com.upscale.front.data.Collateral;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.data.LoanDetail;
-import com.upscale.front.domain.Client;
-import com.upscale.front.domain.CollateralData;
-import com.upscale.front.domain.Loan;
-import com.upscale.front.domain.LoanProducts;
-import com.upscale.front.domain.Products;
-import com.upscale.front.domain.Tenant;
-import com.upscale.front.service.ClientService;
-import com.upscale.front.service.CollateralService;
-import com.upscale.front.service.LoanService;
-import com.upscale.front.service.MailService;
-import com.upscale.front.service.MifosBaseServices;
-import com.upscale.front.service.ProductsService;
-import com.upscale.front.service.SMSService;
-import com.upscale.front.service.TextDetection;
-import com.upscale.front.service.UserService;
-import com.upscale.front.service.TenantService;
+import com.upscale.front.domain.*;
+import com.upscale.front.repository.UserRepository;
+import com.upscale.front.security.SecurityUtils;
+import com.upscale.front.service.*;
 import com.upscale.front.service.util.TextExtractionUtil;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDate;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +23,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.expression.Arrays;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -56,11 +32,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * REST controller for managing the current user's account.
@@ -108,7 +80,7 @@ public class AccountResource {
 
 	@Inject
 	private ProductsService productsService;
-	
+
 	/**
 	 * POST /register : register the user.
 	 *
@@ -394,7 +366,7 @@ public class AccountResource {
 
 	/**
 	 * GET /account/loans : get the current logged in user's loans details
-	 * 
+	 *
 	 * @return the ResponseEntity with status 200 (OK) and the current user's
 	 *         loans details in the body , or status 500 (Internal Server Error)
 	 *         if the user's loan details couldn't be returned
@@ -420,7 +392,7 @@ public class AccountResource {
 
 	/**
 	 * GET /account/documents : get the current logged in user's document
-	 * 
+	 *
 	 * @return the ResponseEntity with status 200 (OK) and the current user's
 	 *         document in body, or status 500 (Internal Server Error) if the
 	 *         user's document couldn't be returned
@@ -451,7 +423,7 @@ public class AccountResource {
 
 	/**
 	 * POST /account/documents : upload the current user's documents
-	 * 
+	 *
 	 * @param document
 	 *            the document model
 	 * @param file
@@ -519,7 +491,7 @@ public class AccountResource {
 		}).orElseGet(() -> new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
-	
+
 	/**
      * DELETE  /account/documents : delete the document by type.
      *
@@ -538,7 +510,7 @@ public class AccountResource {
 				return new ResponseEntity<String>(HttpStatus.OK);
 			}else
 				return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-			
+
 		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 	/**
@@ -607,5 +579,11 @@ public class AccountResource {
 		return (!StringUtils.isEmpty(password) && password.length() >= ManagedUserDTO.PASSWORD_MIN_LENGTH
 				&& password.length() <= ManagedUserDTO.PASSWORD_MAX_LENGTH);
 	}
+
+    /**
+     * POST /account/createapp : Creates the app for the merchant account which he can use to authorise and perform operations over API
+     *
+     * @
+     */
 
 }

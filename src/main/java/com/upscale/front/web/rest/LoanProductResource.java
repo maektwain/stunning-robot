@@ -43,8 +43,8 @@ public class LoanProductResource {
 
 	@Inject
 	private CollateralService collateralService;
-	
-	
+
+
 	@RequestMapping(value = "/collateral",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,7 +80,13 @@ public class LoanProductResource {
             .body(null);
     }
 
-	
+
+    /**
+     * This provides a way to store the tenant Loan Product Information on the lending gateway
+     * @param tenantName
+     * @return
+     */
+
 	@RequestMapping(value = "/loanproducts",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
