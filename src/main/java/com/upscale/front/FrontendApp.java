@@ -55,7 +55,7 @@ public class FrontendApp {
             log.error("You have misconfigured your application! It should not" +
                 "run with both the 'dev' and 'cloud' profiles at the same time.");
         }
-        if(activeProfiles.contains(Constants.SPRING_PROFILE_CLOUD)){
+        if(activeProfiles.contains(Constants.SPRING_PROFILE_DEVELOPMENT)){
         	log.info("Google credentials downloaded");
         	DownloadCredentials download = new DownloadCredentials();
         	download.downloadFile(Constants.GOOGLE_CREDENTIALS_URL, Constants.GOOGLE_CREDENTIALS_DOWNLOAD_PATH);

@@ -20,13 +20,25 @@
 		<maven>3.0.0</maven>
 	</prerequisites>
 
-    <repositories>
-        <repository>
-            <id>sonatype</id>
-            <name>Sonatype Groups</name>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>sonatype</id>
+			<name>Sonatype Groups</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+		</repository>
+
+		<repository>
+			<id>javanto-releases</id>
+			<url>https://raw.github.com/javanto/repository/releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 
 	<properties>
 		<hikaricp.version>2.4.6</hikaricp.version>
@@ -232,11 +244,11 @@
 			<version>${awaitility.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>io.searchbox</groupId>
-            <artifactId>jest</artifactId>
-            <version>2.0.0</version>
-        </dependency>
+		<dependency>
+			<groupId>io.searchbox</groupId>
+			<artifactId>jest</artifactId>
+			<version>2.0.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
@@ -288,8 +300,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- The HikariCP Java Agent is disabled by default, as it is experimental
-			<dependency> <groupId>com.zaxxer</groupId> <artifactId>HikariCP-agent</artifactId>
+		<!-- The HikariCP Java Agent is disabled by default, as it is experimental 
+			<dependency> <groupId>com.zaxxer</groupId> <artifactId>HikariCP-agent</artifactId> 
 			<version>${HikariCP.version}</version> </dependency> -->
 
 		<dependency>
@@ -317,7 +329,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-        <dependency>
+		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<version>${assertj-core.version}</version>
@@ -454,13 +466,21 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-cloudfoundry-connector</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>com.nexmo</groupId>
-            <artifactId>message</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.nexmo</groupId>
+			<artifactId>nexmo-java-sdk</artifactId>
+			<version>1.2</version>
+		</dependency>
 
-        <dependency>
+		<!-- https://mvnrepository.com/artifact/com.nexmo/verify -->
+		<dependency>
+			<groupId>com.nexmo</groupId>
+			<artifactId>verify</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-spring-service-connector</artifactId>
 		</dependency>
@@ -520,12 +540,12 @@
 					<resultsFolder>target/gatling/results</resultsFolder>
 					<bodiesFolder>src/test/gatling/bodies</bodiesFolder>
 					<simulationsFolder>src/test/gatling/simulations</simulationsFolder>
-					<!-- This will force Gatling to ask which simulation to run This is
+					<!-- This will force Gatling to ask which simulation to run This is 
 						useful when you have multiple simulations -->
 					<simulationClass>*</simulationClass>
 				</configuration>
 			</plugin>
-            <plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<configuration>
@@ -622,12 +642,12 @@
 						<configuration>
 							<!-- Sets the path to the file which contains the execution data. -->
 							<destFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</destFile>
-							<!-- Sets the name of the property containing the settings for JaCoCo
+							<!-- Sets the name of the property containing the settings for JaCoCo 
 								runtime agent. -->
 							<propertyName>surefireArgLine</propertyName>
 						</configuration>
 					</execution>
-					<!-- Ensures that the code coverage report for unit tests is created
+					<!-- Ensures that the code coverage report for unit tests is created 
 						after unit tests have been run -->
 					<execution>
 						<id>post-unit-test</id>
@@ -722,7 +742,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<executable>true</executable>
-					<!-- Enable the line below to have remote debugging of your application
+					<!-- Enable the line below to have remote debugging of your application 
 						on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
 				</configuration>
 			</plugin>
@@ -746,8 +766,8 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!-- This plugin's configuration is used to store Eclipse m2e settings
-					only. It has no influence on the Maven build itself. Remove when the m2e
+				<!-- This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. Remove when the m2e 
 					plugin can correctly bind to Maven lifecycle -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
