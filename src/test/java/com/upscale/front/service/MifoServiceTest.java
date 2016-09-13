@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,11 +67,10 @@ public class MifoServiceTest {
     	Tenant tenant = new Tenant(1L, "default", "mifos", "password", "bWlmb3M6cGFzc3dvcmQ=");
     	Collateral collateral = new Collateral(13L, "45000", "collateral description here");
     	List<Collateral> collaterals = Arrays.asList(collateral);
-    	SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
     	LoanData loanData = new LoanData(1L, 1L, "105000", 12, 1, "individual", 12, 1, 1, "15.5", 1, 1, 1, 1, 
-    			sdf.format(LocalDate.now()).toString(), sdf.format(LocalDate.now()).toString(), "dd MMMM yyyy", "en-GB", collaterals);
+    			"13 Sep 2016", "13 Sep 2016" , "dd MMMM yyyy", "en-GB", collaterals);
     	Loan loan = mifosBaseServices.createLoanAccount(loanData, tenant, user);
-    	assertThat(loan.getLoanId()).isNotNull();
+    	assertThat(loan).isNotNull();
     }
     
     
