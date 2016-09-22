@@ -18,7 +18,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 /**
- * 
+ *
  * @author Anurag Garg
  *
  */
@@ -28,21 +28,21 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "clients")
 public class Client extends AbstractAuditingEntity implements Serializable {
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "tenant_id", nullable = false)
 	private Tenant tenant;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
@@ -50,7 +50,15 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	@JsonIgnore
 	@Column(name = "client_id", nullable = false)
 	private Long clientId;
-	
+
+    public Client(){}
+
+    public Client(Tenant tenant, User user, Long clientId){
+        this.tenant = tenant;
+        this.user = user;
+        this.clientId = clientId;
+    }
+
 	public Long getId() {
 		return id;
 	}
@@ -74,7 +82,7 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
+
 	public Long getClientId() {
 		return clientId;
 	}
@@ -102,12 +110,12 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Client{" + "id=" + id + 
-				", tenant Id='" + tenant  + 
-				", clientId='" + clientId + 
+		return "Client{" + "id=" + id +
+				", tenant Id='" + tenant  +
+				", clientId='" + clientId +
 				", user='" + user + "'" + '}';
 	}
 

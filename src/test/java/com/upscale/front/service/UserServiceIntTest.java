@@ -125,7 +125,9 @@ public class UserServiceIntTest {
     }
 
     @Test
-    public void testImageAsyncHappening(){
+    public void testUserImageUpload(){
+    	User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
+    	
 
     }
 }
