@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * 
+ *
  * @author Anurag Garg
  *
  */
@@ -51,6 +51,17 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+
+    public Documents() {}
+
+    public Documents(String documentType, String documentName, String documentId, String documentData,
+        byte[] documentImage){
+        this.documentType = documentType;
+        this.documentName = documentName;
+        this.documentId = documentId;
+        this.documentData = documentData;
+        this.documentImage = documentImage;
+    }
 
 	public Long getId() {
 		return id;
