@@ -41,7 +41,7 @@ public class FrontendApp {
      * Spring profiles can be configured with a program arguments --spring.profiles.active=your-active-profile
      * <p>
      * You can find more information on how profiles work with JHipster on <a href="http://jhipster.github.io/profiles/">http://jhipster.github.io/profiles/</a>.
-     * @throws IOException 
+     * @throws IOException
      */
     @PostConstruct
     public void initApplication() throws IOException {
@@ -55,7 +55,7 @@ public class FrontendApp {
             log.error("You have misconfigured your application! It should not" +
                 "run with both the 'dev' and 'cloud' profiles at the same time.");
         }
-        if(activeProfiles.contains(Constants.SPRING_PROFILE_DEVELOPMENT)){
+        if(activeProfiles.contains(Constants.SPRING_PROFILE_CLOUD)){
         	log.info("Google credentials downloaded");
         	DownloadCredentials download = new DownloadCredentials();
         	download.downloadFile(Constants.GOOGLE_CREDENTIALS_URL, Constants.GOOGLE_CREDENTIALS_DOWNLOAD_PATH);
