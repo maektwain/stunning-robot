@@ -1,38 +1,26 @@
 <div ng-cloak>
     <div class="row">
-        <div class="col-md-4">
-            <span class="hipster img-responsive img-rounded"></span>
+        <div class="col-md-6">
+            <img src="content/images/gateway.png">
+
         </div>
-        <div class="col-md-8">
-            <h1>Lend your dream!</h1>
-            <p class="lead">Upscale your finance ! </p>
 
-            <span>
+        <div class="col-md-6">
+            <h1>Develop.Collborate.Automate</h1>
+            <p class="lead">Deliver finance with upscale lending  API for</p>
+            <p>
+                We provide
+                <span data-words="code|solutions|design"></span>
+                for your business.
+            </p>
 
-                <input type="text" class="form-control" ng-model="searchString" placeholder='Search: e.g. "Coffee Machine" or "Honda Activa"' ng-change="search()"/>
-
-            </span>
-
-
-
+            <p>
+                You ordered
+                <span data-words="1|3|28"></span>
+                <b>big</b>
+                <span data-words="salad|macs|chips"></span>
+            </p>
             <div class="clearfix"></div>
-
-            <table id="list_of_products" class="table table-striped table-condensed" style="margin-top: 60px;">
-                <thead>
-                <tr>
-                    <th style="min-width: 80px;">Brand</th>
-                    <th style="min-width: 80px;">Name</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="result in results">
-                    <td><a href="#/products/{{result.id}}">{{ result.brand }}</a></td>
-                    <td>{{ result.name }}</td>
-                </tr>
-                </tbody>
-            </table>
-
-
             <div ng-switch="vm.isAuthenticated()">
                 <div class="alert alert-success" ng-switch-when="true">
                     You are logged in as user "{{vm.account.login}}".
