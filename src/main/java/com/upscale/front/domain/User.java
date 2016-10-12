@@ -21,7 +21,7 @@ import java.time.ZonedDateTime;
 
 /**
  * Created by Saransh
- * 
+ *
  * Updated by Anurag
  */
 
@@ -90,16 +90,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Lob
 	@Column(name = "user_image", nullable = true, columnDefinition = "mediumblob")
 	private byte[] userImage;
-	
+
 	@Column(name = "father_name", nullable = true)
 	private String fatherName;
-	
+
 	@Column(name = "birth_date", nullable = true)
 	private Date birthDate;
-	
+
 	@Column(name = "address", nullable = true)
 	private String address;
-	
+
 	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "jhi_user_authority", joinColumns = {
@@ -107,6 +107,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 					@JoinColumn(name = "authority_name", referencedColumnName = "name") })
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private Set<Authority> authorities = new HashSet<>();
+
+    @Column(name = "oauth_client_id", nullable = true)
+    private OauthClientDetails   oauthClientDetails;
 
 	public Long getId() {
 		return id;
@@ -221,6 +224,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.authorities = authorities;
 	}
 
+
 	public String getFatherName() {
 		return fatherName;
 	}
@@ -229,7 +233,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.fatherName = fatherName;
 	}
 
-	public Date getBirthDate() {
+    public OauthClientDetails getOauthClientDetails() {
+        return oauthClientDetails;
+    }
+
+    public void setOauthClientDetails(OauthClientDetails oauthClientDetails) {
+        this.oauthClientDetails = oauthClientDetails;
+    }
+
+    public Date getBirthDate() {
 		return birthDate;
 	}
 
@@ -244,7 +256,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
+
 	public byte[] getUserImage() {
 		return userImage;
 	}
