@@ -13,6 +13,7 @@ import com.upscale.front.service.*;
 import com.upscale.front.service.util.TextExtractionUtil;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
+import com.upscale.front.web.rest.dto.OauthClientDetailsDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
@@ -582,7 +583,25 @@ public class AccountResource {
     /**
      * POST /account/createapp : Creates the app for the merchant account which he can use to authorise and perform operations over API
      *
-     * @
+     * @param oauthClientDetailsDTO
+     * the oauth client details which needs to inserted by any user who is logged in or already authenticated
+     *
+     *
      */
+
+    @RequestMapping(value = "/account/createapp", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    public ResponseEntity<String> createClientDetailsOauth(@RequestBody OauthClientDetailsDTO oauthClientDetailsDTO){
+
+        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
+
+            OauthClientDetails oauthClientDetails = userService.createApplication(oauthClientDetailsDTO,u);
+
+
+            return new ResponseEntity<String>(HttpStatus.CREATED);
+
+        }).orElse(new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+    }
 
 }

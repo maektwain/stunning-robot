@@ -4,18 +4,18 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.upscale.front.FrontendApp;
 import com.upscale.front.config.Constants;
-import com.upscale.front.data.ClientData;
 import com.upscale.front.data.Collateral;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.domain.*;
-
-import org.apache.http.client.HttpClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,16 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
 /**
  * Created by saransh on 21/07/16.
  * Test For Mifos Services API

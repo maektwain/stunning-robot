@@ -1,37 +1,33 @@
 package com.upscale.front.service;
 
 import com.upscale.front.domain.Authority;
+import com.upscale.front.domain.OauthClientDetails;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.AuthorityRepository;
+import com.upscale.front.repository.OauthClientRepository;
 import com.upscale.front.repository.UserRepository;
+import com.upscale.front.repository.search.OauthClientDetailsSearchRepository;
 import com.upscale.front.repository.search.UserSearchRepository;
 import com.upscale.front.security.AuthoritiesConstants;
 import com.upscale.front.security.SecurityUtils;
 import com.upscale.front.service.util.RandomUtil;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.upscale.front.web.rest.dto.OauthClientDetailsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.net.ssl.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service class for managing users.
@@ -51,11 +47,17 @@ public class UserService {
 	@Inject
 	private UserSearchRepository userSearchRepository;
 
+    @Inject
+    private OauthClientDetailsSearchRepository oauthClientDetailsSearchRepository;
+
 	@Inject
 	private AuthorityRepository authorityRepository;
 
 	@Inject
 	private SMSService smsService;
+
+    @Inject
+    private OauthClientRepository oauthRepository;
 
 
 
@@ -89,10 +91,7 @@ public class UserService {
 			user.setActivated(true);
 			user.setActivationKey(null);
 
-			/**
-			 * First mifos authentication will happen through an interface and
-			 * then get the mifos base key and create a mifos
-			 */
+
 
 			userRepository.save(user);
 			userSearchRepository.save(user);
@@ -204,6 +203,29 @@ public class UserService {
 		return user;
 	}
 
+    public OauthClientDetails createApplication(OauthClientDetailsDTO oauthClientDetailsDTO,User u){
+        OauthClientDetails oauthClientDetails = new OauthClientDetails();
+        oauthClientDetails.setApplicationname(oauthClientDetailsDTO.getApplicationname());
+        byte[] encode = Base64.encode(oauthClientDetailsDTO.getApplicationname().getBytes());
+        oauthClientDetails.setClientsecret(encode.toString());
+        oauthClientDetails.setScope("read", "write");
+        oauthClientDetails.setAuthorizedgranttypes("password","refresh_token" ,"authorization_code" ,"implicit");
+        oauthClientDetails.setAuthorities("ROLE_USER");
+        oauthClientDetails.setAccesstokenvalidity(1800);
+        oauthClientDetails.setWebserverredirecturi(oauthClientDetailsDTO.getCallbackurl());
+        u.setOauthClientDetails(oauthClientDetails);
+        userRepository.save(u);
+        oauthRepository.save(oauthClientDetails);
+        /**
+         * TBD The problem which is
+         * That inside the domain/model we need to assign an ID, like Primary Key but given the fact that primary key can also be the application name
+         * which can be unique
+         */
+
+        //oauthClientDetailsSearchRepository.save(oauthClientDetails);
+        return oauthClientDetails;
+    }
+
 	public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
 		userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
 			u.setFirstName(firstName);
@@ -232,6 +254,8 @@ public class UserService {
 			log.debug("Changed password for User: {}", u);
 		});
 	}
+
+
 
 	@Transactional(readOnly = true)
 	public Optional<User> getUserWithAuthoritiesByLogin(String login) {
