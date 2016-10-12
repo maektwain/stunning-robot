@@ -62,7 +62,7 @@ public class MifosBaseServices extends Unirest {
 
 
 	private static final String URL = Constants.MIFOS_URL;
-	
+
 	@Inject
 	private TenantsRepository tenantsRepository;
 
@@ -476,7 +476,7 @@ public class MifosBaseServices extends Unirest {
 				.header("accept", "application/json")
 				.header("Authorization", "Basic " + tenant.getAuthKey())
 				.field("file", new File(Constants.FILE_TEMP_DOWNLOAD + fileName), "image/jpeg")
-				.asString();	
+				.asString();
 
 			log.debug("String", post.getStatus());
 			log.debug("String ", post);
@@ -539,7 +539,7 @@ public class MifosBaseServices extends Unirest {
 				.field("description", doc.getDocumentData())
 				.field("name", doc.getDocumentName())
 				.field("file", new File(Constants.FILE_TEMP_DOWNLOAD+ fileName ), "image/jpeg")
-				.asString();	
+				.asString();
 			log.debug("String", post.getStatus());
 			log.debug("String ", post);
 			status.add(post.getStatus());

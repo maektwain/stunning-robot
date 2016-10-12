@@ -313,7 +313,6 @@ public class AccountResource {
 	/***
 	 * POST /account/loan : create a loan for a tenant in mifos service
 	 *
-	 * @param tenant
 	 * @return the ResponseEntity with status 200 (OK), or status 400 (Bad
 	 *         Request) if the loan created successfully
 	 */
@@ -424,7 +423,7 @@ public class AccountResource {
 	/**
 	 * POST /account/documents : upload the current user's documents
 	 *
-	 * @param document
+	 * @param documentType
 	 *            the document model
 	 * @param file
 	 *            document file
@@ -495,7 +494,7 @@ public class AccountResource {
 	/**
      * DELETE  /account/documents : delete the document by type.
      *
-     * @param document type of the document to delete
+     * @param documentType type of the document to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/account/documents",
