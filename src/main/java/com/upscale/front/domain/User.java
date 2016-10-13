@@ -108,8 +108,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private Set<Authority> authorities = new HashSet<>();
 
+
     @Column(name = "oauth_client_id", nullable = true)
-    private OauthClientDetails   oauthClientDetails;
+    private OauthClientDetails oauthClientDetails;
 
 	public Long getId() {
 		return id;

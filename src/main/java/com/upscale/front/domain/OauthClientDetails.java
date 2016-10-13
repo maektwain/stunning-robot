@@ -4,10 +4,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.jws.soap.SOAPBinding;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -24,9 +22,10 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
     private static final long serialVersionUID = 1L;
 
 
-
     @Id
-    @org.springframework.data.annotation.Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @Size(min = 1, max = 255)
     @Column(name = "client_id"  ,length = 255, unique = true, nullable = false)
     private String applicationname;
@@ -62,7 +61,20 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
     @Column(name = "autoapprove", length = 4096)
     private String autoapprove;
 
+    @ManyToOne
+    @Column(name = "user_id", nullable = false)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private User user;
 
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getApplicationname() {
         return applicationname;
@@ -151,6 +163,10 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
     public void setAutoapprove(String autoapprove) {
         this.autoapprove = autoapprove;
     }
+
+    public User getUser() { return  user; }
+
+    public  void setUser(User user) { this.user = user; }
 
     @Override
     public boolean equals(Object o) {

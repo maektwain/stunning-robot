@@ -1,5 +1,6 @@
 package com.upscale.front.service;
 
+import com.upscale.front.data.OauthData;
 import com.upscale.front.domain.Authority;
 import com.upscale.front.domain.OauthClientDetails;
 import com.upscale.front.domain.User;
@@ -15,6 +16,7 @@ import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.OauthClientDetailsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,11 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service class for managing users.
@@ -205,8 +205,12 @@ public class UserService {
 
     public OauthClientDetails createApplication(OauthClientDetailsDTO oauthClientDetailsDTO,User u){
         OauthClientDetails oauthClientDetails = new OauthClientDetails();
-        oauthClientDetails.setApplicationname(oauthClientDetailsDTO.getApplicationname());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date today = Calendar.getInstance().getTime();
+        String date = sdf.format(today);
+        oauthClientDetails.setApplicationname(date + oauthClientDetailsDTO.getApplicationname());
         byte[] encode = Base64.encode(oauthClientDetailsDTO.getApplicationname().getBytes());
+        oauthClientDetails.setUser(u);
         oauthClientDetails.setClientsecret(encode.toString());
         oauthClientDetails.setScope("read", "write");
         oauthClientDetails.setAuthorizedgranttypes("password","refresh_token" ,"authorization_code" ,"implicit");
@@ -224,6 +228,26 @@ public class UserService {
 
         //oauthClientDetailsSearchRepository.save(oauthClientDetails);
         return oauthClientDetails;
+    }
+
+    public OauthData retrieveApplications(User u) {
+        OauthClientDetails oauthClientDetails = oauthRepository.findAllByUser(u).get();
+        OauthData oauthData = new OauthData();
+
+        oauthData.setId(oauthClientDetails.getId());
+        oauthData.setCliendId(oauthClientDetails.getApplicationname());
+        oauthData.setClientToken(oauthClientDetails.getClientsecret());
+        return oauthData;
+    }
+
+
+    public OauthClientDetails retrieveApplicationsByName(String applicationName, User u) {
+        OauthClientDetails oauthClientDetails = oauthRepository.findByApplicationName(applicationName, u).get();
+        return oauthClientDetails;
+    }
+
+    public void deleteApplication(OauthClientDetails oauthClientDetails) {
+        oauthRepository.delete(oauthClientDetails);
     }
 
 	public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
