@@ -1,9 +1,12 @@
 package com.upscale.front.service;
 
 import com.upscale.front.FrontendApp;
+import com.upscale.front.data.OauthData;
+import com.upscale.front.domain.OauthClientDetails;
 import com.upscale.front.domain.User;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.service.util.RandomUtil;
+import com.upscale.front.web.rest.dto.OauthClientDetailsDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
@@ -125,9 +128,28 @@ public class UserServiceIntTest {
     }
 
     @Test
-    public void testUserImageUpload(){
-    	User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
-    	
-
+    public void testApplicationCreationByUser() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
+        OauthClientDetailsDTO oauthClientDetailsDTO = new OauthClientDetailsDTO("Test Application", "This application is for testing purpose only", "https://theupscale.co.in/test");
+        assertThat(userService.createApplication(oauthClientDetailsDTO, user)).isNotNull();
     }
+
+    @Test
+    public void testToRetrieveApplicationOauthToken() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
+        OauthClientDetailsDTO oauthClientDetailsDTO = new OauthClientDetailsDTO("Test Application", "This application is for testing purpose only", "https://theupscale.co.in/test");
+        userService.createApplication(oauthClientDetailsDTO, user);
+        OauthData oauthData = userService.retrieveApplications(user);
+        assertThat(oauthData).isNotNull();
+    }
+
+    @Test
+    public void testToDeleteApplication() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
+        OauthClientDetailsDTO oauthClientDetailsDTO = new OauthClientDetailsDTO("Test Application", "This application is for testing purpose only", "https://theupscale.co.in/test");
+        userService.createApplication(oauthClientDetailsDTO, user);
+        OauthClientDetails oauthClientDetails = userService.retrieveApplicationsByName("Test Application", user);
+        assertThat(userService.deleteApplication(oauthClientDetails)).isNotNull();
+    }
+
 }

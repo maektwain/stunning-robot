@@ -632,9 +632,9 @@ public class AccountResource {
 
     @RequestMapping(value = "/account/apps", method = RequestMethod.DELETE, produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    public ResponseEntity<String> deleteApp(@RequestParam(value = "applicationName") String applicationName) {
+    public ResponseEntity<String> deleteApp(@RequestParam(value = "applicationname") String applicationname) {
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
-            OauthClientDetails oauthClientDetails = userService.retrieveApplicationsByName(applicationName, u);
+            OauthClientDetails oauthClientDetails = userService.retrieveApplicationsByName(applicationname, u);
             userService.deleteApplication(oauthClientDetails);
             return new ResponseEntity<String>(HttpStatus.GONE);
         }).orElse(new ResponseEntity<String>(HttpStatus.FOUND.INTERNAL_SERVER_ERROR));

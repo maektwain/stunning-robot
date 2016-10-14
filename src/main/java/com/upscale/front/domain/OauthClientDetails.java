@@ -62,11 +62,9 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
     private String autoapprove;
 
     @ManyToOne
-    @Column(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private User user;
-
-
 
     public Long getId() {
         return id;
@@ -208,6 +206,7 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
         result = 31 * result + (refreshtokenvalidity != null ? refreshtokenvalidity.hashCode() : 0);
         result = 31 * result + (additionalinformation != null ? additionalinformation.hashCode() : 0);
         result = 31 * result + (autoapprove != null ? autoapprove.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
         return result;
     }
 }

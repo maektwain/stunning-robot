@@ -217,8 +217,6 @@ public class UserService {
         oauthClientDetails.setAuthorities("ROLE_USER");
         oauthClientDetails.setAccesstokenvalidity(1800);
         oauthClientDetails.setWebserverredirecturi(oauthClientDetailsDTO.getCallbackurl());
-        u.setOauthClientDetails(oauthClientDetails);
-        userRepository.save(u);
         oauthRepository.save(oauthClientDetails);
         /**
          * TBD The problem which is
@@ -234,20 +232,21 @@ public class UserService {
         OauthClientDetails oauthClientDetails = oauthRepository.findAllByUser(u).get();
         OauthData oauthData = new OauthData();
 
-        oauthData.setId(oauthClientDetails.getId());
+        //oauthData.setId(oauthClientDetails.getId());
         oauthData.setCliendId(oauthClientDetails.getApplicationname());
         oauthData.setClientToken(oauthClientDetails.getClientsecret());
         return oauthData;
     }
 
 
-    public OauthClientDetails retrieveApplicationsByName(String applicationName, User u) {
-        OauthClientDetails oauthClientDetails = oauthRepository.findByApplicationName(applicationName, u).get();
+    public OauthClientDetails retrieveApplicationsByName(String applicationname, User u) {
+        OauthClientDetails oauthClientDetails = oauthRepository.findOneByApplicationNameAndUser(applicationname, u).get();
         return oauthClientDetails;
     }
 
-    public void deleteApplication(OauthClientDetails oauthClientDetails) {
+    public String deleteApplication(OauthClientDetails oauthClientDetails) {
         oauthRepository.delete(oauthClientDetails);
+        return "Deleted";
     }
 
 	public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
