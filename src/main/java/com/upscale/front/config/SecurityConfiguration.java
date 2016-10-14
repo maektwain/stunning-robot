@@ -14,10 +14,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
-
 
 import javax.inject.Inject;
 
@@ -56,9 +55,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/register")
             .antMatchers("/api/mobileRegister")
             .antMatchers("/api/activatem")
-            .antMatchers(HttpMethod.GET ,"/api/products")
+            .antMatchers(HttpMethod.GET, "/api/products")
             .antMatchers(HttpMethod.GET, "/api/products/{id}")
             .antMatchers(HttpMethod.GET, "/api/_search/products")
+            .antMatchers(HttpMethod.GET, "/api/loanproducts")
+            .antMatchers(HttpMethod.GET, "/api/_search/loanproducts")
             .antMatchers("/api/activate")
             .antMatchers("/api/account/reset_password/init")
             .antMatchers("/api/account/reset_password/finish")

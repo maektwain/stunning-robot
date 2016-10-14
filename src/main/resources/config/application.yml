@@ -11,6 +11,7 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+
 management:
     context-path: /management
     health:
@@ -36,8 +37,12 @@ spring:
         favicon:
             enabled: false
     thymeleaf:
-        mode: XHTML
+        mode: XHTML  
 
+multipart:
+     maxFileSize: 10MB
+     maxRequestSize: 50MB
+     
 security:
     basic:
         enabled: false

@@ -13,244 +13,276 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.time.ZonedDateTime;
 
 /**
- * A user.
+ * Created by Saransh
+ *
+ * Updated by Anurag
  */
+
 @Entity
 @Table(name = "jhi_user")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "user")
 public class User extends AbstractAuditingEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@Pattern(regexp = Constants.LOGIN_REGEX)
+	@Size(min = 1, max = 50)
+	@Column(length = 50, unique = true, nullable = false)
+	private String login;
+
+	@JsonIgnore
+	@Size(min = 60, max = 60)
+	@Column(name = "password_hash", length = 60)
+	private String password;
+
+	@Size(max = 50)
+	@Column(name = "first_name", length = 50)
+	private String firstName;
+
+	@Size(max = 50)
+	@Column(name = "last_name", length = 50)
+	private String lastName;
+
+	@Email
+	@Size(max = 100)
+	@Column(length = 100, unique = true)
+	private String email;
+
+	@Size(max = 10)
+	@Column(name = "mobile", length = 10, unique = true)
+	private String mobile;
+
+	@NotNull
+	@Column(nullable = false)
+	private boolean activated = false;
+
+	@Size(min = 2, max = 5)
+	@Column(name = "lang_key", length = 5)
+	private String langKey;
+
+	@Size(max = 20)
+	@Column(name = "activation_key", length = 20)
+	@JsonIgnore
+	private String activationKey;
+
+	@Size(max = 20)
+	@Column(name = "reset_key", length = 20)
+	private String resetKey;
+
+	@Column(name = "reset_date", nullable = true)
+	private ZonedDateTime resetDate = null;
+
+	@Column(name = "request_id", nullable = true)
+	private String requestId;
+
+	@Lob
+	@Column(name = "user_image", nullable = true, columnDefinition = "mediumblob")
+	private byte[] userImage;
+
+	@Column(name = "father_name", nullable = true)
+	private String fatherName;
+
+	@Column(name = "birth_date", nullable = true)
+	private Date birthDate;
+
+	@Column(name = "address", nullable = true)
+	private String address;
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "jhi_user_authority", joinColumns = {
+			@JoinColumn(name = "user_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "authority_name", referencedColumnName = "name") })
+	@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+	private Set<Authority> authorities = new HashSet<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
+
+	// Lowercase the login before saving it in database
+	public void setLogin(String login) {
+		this.login = login.toLowerCase(Locale.ENGLISH);
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public boolean getActivated() {
+		return activated;
+	}
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
+
+	public String getActivationKey() {
+		return activationKey;
+	}
+
+	public void setActivationKey(String activationKey) {
+		this.activationKey = activationKey;
+	}
+
+	public String getResetKey() {
+		return resetKey;
+	}
+
+	public void setResetKey(String resetKey) {
+		this.resetKey = resetKey;
+	}
+
+	public ZonedDateTime getResetDate() {
+		return resetDate;
+	}
+
+	public void setResetDate(ZonedDateTime resetDate) {
+		this.resetDate = resetDate;
+	}
+
+	public String getLangKey() {
+		return langKey;
+	}
+
+	public void setLangKey(String langKey) {
+		this.langKey = langKey;
+	}
+
+	public Set<Authority> getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(Set<Authority> authorities) {
+		this.authorities = authorities;
+	}
 
 
-    @Pattern(regexp = Constants.LOGIN_REGEX)
-    @Size(min = 1, max = 50)
-    @Column(length = 50, unique = true, nullable = false)
-    private String login;
+	public String getFatherName() {
+		return fatherName;
+	}
 
-    @JsonIgnore
-    @Size(min = 60, max = 60)
-    @Column(name = "password_hash",length = 60)
-    private String password;
+	public void setFatherName(String fatherName) {
+		this.fatherName = fatherName;
+	}
 
-    @Size(max = 50)
-    @Column(name = "first_name", length = 50)
-    private String firstName;
+    public Date getBirthDate() {
+		return birthDate;
+	}
 
-    @Size(max = 50)
-    @Column(name = "last_name", length = 50)
-    private String lastName;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
 
-    @Email
-    @Size(max = 100)
-    @Column(length = 100, unique = true)
-    private String email;
+	public String getAddress() {
+		return address;
+	}
 
-    @Size(max = 10)
-    @Column(name = "mobile", length = 10, unique = true)
-    private String mobile;
+	public void setAddress(String address) {
+		this.address = address;
+	}
 
-    @NotNull
-    @Column(nullable = false)
-    private boolean activated = false;
+	public byte[] getUserImage() {
+		return userImage;
+	}
 
-    @Size(min = 2, max = 5)
-    @Column(name = "lang_key", length = 5)
-    private String langKey;
-
-    @Size(max = 20)
-    @Column(name = "activation_key", length = 20)
-    @JsonIgnore
-    private String activationKey;
-
-    @Size(max = 20)
-    @Column(name = "reset_key", length = 20)
-    private String resetKey;
-
-    @Column(name = "reset_date", nullable = true)
-    private ZonedDateTime resetDate = null;
-
-    @Column(name = "request_id", nullable = true)
-    private String requestId;
+	public void setUserImage(byte[] userImage) {
+		this.userImage = userImage;
+	}
 
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-        name = "jhi_user_authority",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Set<Authority> authorities = new HashSet<>();
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-    @Column(name = "client_id", nullable = true)
-    private Long clientId;
+		User user = (User) o;
 
-    @Column(name = "self_service_id", nullable = true)
-    private Long selfServiceId;
+		if (!login.equals(user.login)) {
+			return false;
+		}
 
+		return true;
+	}
 
+	@Override
+	public int hashCode() {
+		return login.hashCode();
+	}
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getClientId() {return clientId; }
-
-    public void setClientId(Long id) {this.clientId = id;}
-
-    public Long getSelfServiceId() {return selfServiceId; }
-
-    public void setSelfServiceId(Long id) { this.selfServiceId = id;}
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getRequestId() {return requestId;}
-
-    public void setRequestId(String requestId){this.requestId = requestId;}
-
-    //Lowercase the login before saving it in database
-    public void setLogin(String login) {
-        this.login = login.toLowerCase(Locale.ENGLISH);
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getMobile() {return mobile; }
-
-    public void setMobile(String mobile){this.mobile = mobile;}
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public boolean getActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
-    public String getActivationKey() {
-        return activationKey;
-    }
-
-    public void setActivationKey(String activationKey) {
-        this.activationKey = activationKey;
-    }
-
-    public String getResetKey() {
-        return resetKey;
-    }
-
-    public void setResetKey(String resetKey) {
-        this.resetKey = resetKey;
-    }
-
-    public ZonedDateTime getResetDate() {
-       return resetDate;
-    }
-
-    public void setResetDate(ZonedDateTime resetDate) {
-       this.resetDate = resetDate;
-    }
-
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
-
-    public Set<Authority> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        User user = (User) o;
-
-        if (!login.equals(user.login)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return login.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", mobile='" + mobile + '\'' +
-            ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
-            ", clientId'" + clientId + '\'' +
-            ", selfServiceId'" + selfServiceId + '\'' +
-            ", activationKey='" + activationKey + '\'' +
-            "}";
-    }
+	@Override
+	public String toString() {
+		return "User{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName
+				+ '\'' + ", email='" + email + '\'' + ", mobile='" + mobile + '\'' + ", activated='" + activated + '\''
+				+ ", langKey='" + langKey + '\''
+				+ '\'' + ", activationKey='" + activationKey + '\'' + "}";
+	}
 }
