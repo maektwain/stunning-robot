@@ -25,6 +25,7 @@ public final class Constants {
     public static final String GOOGLE_CREDENTIALS_DOWNLOAD_PATH = "/home/anurag/Documents/GoogleCredentials/";
     // File download path
     public static final String FILE_TEMP_DOWNLOAD = "/home/anurag/Dcouments/tmp/";
+
     // Mifos URL
     public static final String MIFOS_URL = "https://localhost:8443/fineract-provider/api/v1";
 
