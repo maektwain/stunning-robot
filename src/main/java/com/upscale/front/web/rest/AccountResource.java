@@ -6,6 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.upscale.front.data.Collateral;
 import com.upscale.front.data.LoanData;
 import com.upscale.front.data.LoanDetail;
+import com.upscale.front.data.OauthData;
 import com.upscale.front.domain.*;
 import com.upscale.front.repository.UserRepository;
 import com.upscale.front.security.SecurityUtils;
@@ -13,6 +14,7 @@ import com.upscale.front.service.*;
 import com.upscale.front.service.util.TextExtractionUtil;
 import com.upscale.front.web.rest.dto.KeyAndPasswordDTO;
 import com.upscale.front.web.rest.dto.ManagedUserDTO;
+import com.upscale.front.web.rest.dto.OauthClientDetailsDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
 import org.apache.commons.lang.StringUtils;
@@ -582,7 +584,48 @@ public class AccountResource {
     /**
      * POST /account/createapp : Creates the app for the merchant account which he can use to authorise and perform operations over API
      *
-     * @
+     * @param oauthClientDetailsDTO
+     * the oauth client details which needs to inserted by any user who is logged in or already authenticated
+     *
+     *
      */
+
+    @RequestMapping(value = "/account/apps", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    public ResponseEntity<String> createClientDetailsOauth(@RequestBody OauthClientDetailsDTO oauthClientDetailsDTO){
+
+        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
+
+            OauthClientDetails oauthClientDetails = userService.createApplication(oauthClientDetailsDTO,u);
+
+            return new ResponseEntity<String>(HttpStatus.CREATED);
+
+        }).orElse(new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+    }
+
+    @RequestMapping(value = "/account/apps", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> retriveAllApps() {
+        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
+
+            OauthData oauthData = userService.retrieveApplications(u);
+
+            return new ResponseEntity<OauthData>(oauthData, HttpStatus.FOUND);
+
+        }).orElse(new ResponseEntity<OauthData>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+    }
+
+
+    @RequestMapping(value = "/account/apps", method = RequestMethod.DELETE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    public ResponseEntity<String> deleteApp(@RequestParam(value = "applicationname") String applicationname) {
+        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
+            OauthClientDetails oauthClientDetails = userService.retrieveApplicationsByName(applicationname, u);
+            userService.deleteApplication(oauthClientDetails);
+            return new ResponseEntity<String>(HttpStatus.GONE);
+        }).orElse(new ResponseEntity<String>(HttpStatus.FOUND.INTERNAL_SERVER_ERROR));
+    }
 
 }

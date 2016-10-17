@@ -4,22 +4,50 @@
             <img src="content/images/gateway.png">
 
         </div>
+        <script>
+        $(function () {
+    var hello = ['consumers', 'e-commerce', 'partners', 'mfi', 'nbfc'];
+    var used = ['consumers'];
+    var greeting = $('#what');
+    var item;
+
+    function hey() {
+
+        item = hello[Math.floor(Math.random() * hello.length)];
+        if (hello.length != used.length) {
+            while (jQuery.inArray(item, used) != -1) {
+                item = hello[Math.floor(Math.random() * hello.length)];
+            }
+            used.push(item);
+        } else {
+            used.length = 0;
+            item = hello[Math.floor(Math.random() * hello.length)];
+            used.push(item);
+        }
+        greeting.text(item);
+        greeting.animate({
+            "width": "toggle",
+                "opacity": 1
+        }, 1500);
+    }
+
+    window.setInterval(function () {
+        greeting.animate({
+            "width": "toggle",
+                "opacity": 0
+        }, {
+            duration: 1500,
+            complete: setTimeout(hey, 1500)
+        });
+    }, 5000);
+
+});
+        </script>
 
         <div class="col-md-6">
             <h1>Develop.Collborate.Automate</h1>
-            <p class="lead">Deliver finance with upscale lending  API for</p>
-            <p>
-                We provide
-                <span data-words="code|solutions|design"></span>
-                for your business.
-            </p>
-
-            <p>
-                You ordered
-                <span data-words="1|3|28"></span>
-                <b>big</b>
-                <span data-words="salad|macs|chips"></span>
-            </p>
+            <p class="lead">Deliver finance with upscale lending  API for <span id="what">consumers
+            </span> </p>
             <div class="clearfix"></div>
             <div ng-switch="vm.isAuthenticated()">
                 <div class="alert alert-success" ng-switch-when="true">
