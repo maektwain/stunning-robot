@@ -65,6 +65,12 @@
                             </a>
                         </li>
                         <li ui-sref-active="active" ng-switch-when="true">
+                            <a ui-sref="oauthapp" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-plus"></span>&nbsp;
+                                <span>Create Application</span>
+                            </a>
+                        </li>
+                        <li ui-sref-active="active" ng-switch-when="true">
                             <a ui-sref="password" ng-click="vm.collapseNavbar()">
                                 <span class="glyphicon glyphicon-lock"></span>&nbsp;
                                 <span>Password</span>
