@@ -604,7 +604,7 @@ public class AccountResource {
 
     }
 
-    @RequestMapping(value = "/account/apps", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(value = "/account/apps", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> retriveAllApps() {
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
@@ -617,18 +617,6 @@ public class AccountResource {
 
     }
 
-    @RequestMapping(value = "/account/apps", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-    @Timed
-    public ResponseEntity<?> retriveAllApps(@RequestParam(value = "applicationName") String applicationName) {
-        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
-
-            OauthData oauthData = userService.retrieveApplications(u);
-
-            return new ResponseEntity<OauthData>(oauthData, HttpStatus.FOUND);
-
-        }).orElse(new ResponseEntity<OauthData>(HttpStatus.INTERNAL_SERVER_ERROR));
-
-    }
 
     @RequestMapping(value = "/account/apps", method = RequestMethod.DELETE, produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed

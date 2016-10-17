@@ -1,38 +1,54 @@
 <div ng-cloak>
     <div class="row">
-        <div class="col-md-4">
-            <span class="hipster img-responsive img-rounded"></span>
+        <div class="col-md-6">
+            <img src="content/images/gateway.png">
+
         </div>
-        <div class="col-md-8">
-            <h1>Lend your dream!</h1>
-            <p class="lead">Upscale your finance ! </p>
+        <script>
+        $(function () {
+    var hello = ['consumers', 'e-commerce', 'partners', 'mfi', 'nbfc'];
+    var used = ['consumers'];
+    var greeting = $('#what');
+    var item;
 
-            <span>
+    function hey() {
 
-                <input type="text" class="form-control" ng-model="searchString" placeholder='Search: e.g. "Coffee Machine" or "Honda Activa"' ng-change="search()"/>
+        item = hello[Math.floor(Math.random() * hello.length)];
+        if (hello.length != used.length) {
+            while (jQuery.inArray(item, used) != -1) {
+                item = hello[Math.floor(Math.random() * hello.length)];
+            }
+            used.push(item);
+        } else {
+            used.length = 0;
+            item = hello[Math.floor(Math.random() * hello.length)];
+            used.push(item);
+        }
+        greeting.text(item);
+        greeting.animate({
+            "width": "toggle",
+                "opacity": 1
+        }, 1500);
+    }
 
-            </span>
+    window.setInterval(function () {
+        greeting.animate({
+            "width": "toggle",
+                "opacity": 0
+        }, {
+            duration: 1500,
+            complete: setTimeout(hey, 1500)
+        });
+    }, 5000);
 
+});
+        </script>
 
-
+        <div class="col-md-6">
+            <h1>Develop.Collborate.Automate</h1>
+            <p class="lead">Deliver finance with upscale lending  API for <span id="what">consumers
+            </span> </p>
             <div class="clearfix"></div>
-
-            <table id="list_of_products" class="table table-striped table-condensed" style="margin-top: 60px;">
-                <thead>
-                <tr>
-                    <th style="min-width: 80px;">Brand</th>
-                    <th style="min-width: 80px;">Name</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="result in results">
-                    <td><a href="#/products/{{result.id}}">{{ result.brand }}</a></td>
-                    <td>{{ result.name }}</td>
-                </tr>
-                </tbody>
-            </table>
-
-
             <div ng-switch="vm.isAuthenticated()">
                 <div class="alert alert-success" ng-switch-when="true">
                     You are logged in as user "{{vm.account.login}}".

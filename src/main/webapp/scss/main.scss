@@ -104,6 +104,7 @@ Main page styles
     background-size: contain;
 }
 
+
 /* wait autoprefixer update to allow simple generation of high pixel density media query */
 @media
 only screen and (-webkit-min-device-pixel-ratio: 2),
@@ -124,6 +125,18 @@ Generic styles
 .error {
     color: white;
     background-color: red;
+}
+
+
+
+/* WORDS SWAP */
+[data-words]{
+  vertical-align: top;
+  position: static;
+}
+[data-words] > span{
+  position: absolute;
+  color: chocolate;
 }
 
 .pad {
@@ -323,6 +336,7 @@ entity detail page css
         }
     }
 }
+
 
 /* ==========================================================================
 ui bootstrap tweaks

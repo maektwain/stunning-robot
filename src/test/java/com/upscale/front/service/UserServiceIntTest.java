@@ -127,6 +127,7 @@ public class UserServiceIntTest {
         assertThat(users).isEmpty();
     }
 
+
     @Test
     public void testApplicationCreationByUser() {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
@@ -151,5 +152,7 @@ public class UserServiceIntTest {
         OauthClientDetails oauthClientDetails = userService.retrieveApplicationsByName("Test Application", user);
         assertThat(userService.deleteApplication(oauthClientDetails)).isNotNull();
     }
+
+
 
 }

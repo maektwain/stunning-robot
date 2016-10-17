@@ -4,7 +4,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -38,16 +37,16 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
     private String clientsecret;
 
     @Column(name = "scope", length = 255)
-    private String[] scope;
+    private String  scopes;
 
     @Column(name = "authorized_grant_types", length = 255)
-    private String[] authorizedgranttypes;
+    private String  authorizedGrantTypes;
 
     @Column(name = "web_server_redirect_uri", length = 255)
     private String webserverredirecturi;
 
     @Column(name = "authorities", length = 255)
-    private String[] authorities;
+    private String  authorities;
 
     @Column(name = "access_token_validity", length = 11)
     private Integer accesstokenvalidity;
@@ -98,20 +97,23 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
         this.clientsecret = clientsecret;
     }
 
-    public String[] getScope() {
-        return scope;
+    public String getScope() {
+        return scopes;
     }
 
-    public void setScope(String... scope) {
-        this.scope = scope;
+    public void setScope(String... scopes) {
+        String joined = String.join(",",scopes);
+       this.scopes = joined;
     }
 
-    public String[] getAuthorizedgranttypes() {
-        return authorizedgranttypes;
+    public String getAuthorizedgranttypes() {
+        return authorizedGrantTypes;
     }
 
-    public void setAuthorizedgranttypes(String... authorizedgranttypes) {
-        this.authorizedgranttypes = authorizedgranttypes;
+    public void  setAuthorizedGrantTypes(String... authorizedGrantTypes) {
+        String joined = String.join(",",authorizedGrantTypes);
+        this.authorizedGrantTypes = joined;
+
     }
 
     public String getWebserverredirecturi() {
@@ -122,12 +124,14 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
         this.webserverredirecturi = webserverredirecturi;
     }
 
-    public String[] getAuthorities() {
+    public String getAuthorities() {
         return authorities;
     }
 
     public void setAuthorities(String... authorities) {
-        this.authorities = authorities;
+        String joined = String.join(",", authorities);
+        this.authorities = joined;
+
     }
 
     public Integer getAccesstokenvalidity() {
@@ -177,8 +181,8 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
             return false;
         if (resourceIds != null ? !resourceIds.equals(that.resourceIds) : that.resourceIds != null) return false;
         if (clientsecret != null ? !clientsecret.equals(that.clientsecret) : that.clientsecret != null) return false;
-        if (scope != null ? !scope.equals(that.scope) : that.scope != null) return false;
-        if (authorizedgranttypes != null ? !authorizedgranttypes.equals(that.authorizedgranttypes) : that.authorizedgranttypes != null)
+        if (scopes != null ? !scopes.equals(that.scopes) : that.scopes != null) return false;
+        if (authorizedGrantTypes != null ? !authorizedGrantTypes.equals(that.authorizedGrantTypes) : that.authorizedGrantTypes != null)
             return false;
         if (webserverredirecturi != null ? !webserverredirecturi.equals(that.webserverredirecturi) : that.webserverredirecturi != null)
             return false;
@@ -198,8 +202,8 @@ public class OauthClientDetails extends AbstractAuditingEntity implements Serial
         int result = applicationname != null ? applicationname.hashCode() : 0;
         result = 31 * result + (resourceIds != null ? resourceIds.hashCode() : 0);
         result = 31 * result + (clientsecret != null ? clientsecret.hashCode() : 0);
-        result = 31 * result + (scope != null ? scope.hashCode() : 0);
-        result = 31 * result + (authorizedgranttypes != null ? authorizedgranttypes.hashCode() : 0);
+        result = 31 * result + (scopes != null ? scopes.hashCode() : 0);
+        result = 31 * result + (authorizedGrantTypes != null ? authorizedGrantTypes.hashCode() : 0);
         result = 31 * result + (webserverredirecturi != null ? webserverredirecturi.hashCode() : 0);
         result = 31 * result + (authorities != null ? authorities.hashCode() : 0);
         result = 31 * result + (accesstokenvalidity != null ? accesstokenvalidity.hashCode() : 0);

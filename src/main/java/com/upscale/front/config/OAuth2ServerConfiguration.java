@@ -90,6 +90,7 @@ public class OAuth2ServerConfiguration {
             endpoints
                     .tokenStore(tokenStore())
                     .authenticationManager(authenticationManager);
+
         }
 
         @Override
@@ -100,7 +101,7 @@ public class OAuth2ServerConfiguration {
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
             clients
-                .inMemory()
+                .jdbc(dataSource)
                 .withClient(jHipsterProperties.getSecurity().getAuthentication().getOauth().getClientid())
                 .scopes("read", "write")
                 .authorities(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)

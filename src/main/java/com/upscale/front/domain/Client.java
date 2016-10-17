@@ -51,7 +51,6 @@ public class Client extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "client_id", nullable = false)
 	private Long clientId;
 
-
 	public Client(){}
 
     public Client(Tenant tenant, User user, Long clientId){
