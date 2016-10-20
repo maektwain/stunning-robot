@@ -9,7 +9,7 @@
             </button>
             <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
                 <img class="logo-img" src="content/images/logo-jhipster.png"/>
-                <span>FinLend</span> <span class="navbar-version">v{{VERSION}}</span>
+                <span>Upscale Lending Gateway</span> <span class="navbar-version">v{{VERSION}}</span>
             </a>
         </div>
         <div class="navbar-collapse" uib-collapse="vm.isNavbarCollapsed" ng-switch="vm.isAuthenticated()">
@@ -62,6 +62,12 @@
                             <a ui-sref="settings" ng-click="vm.collapseNavbar()">
                                 <span class="glyphicon glyphicon-wrench"></span>&nbsp;
                                 <span>Settings</span>
+                            </a>
+                        </li>
+                        <li ui-sref-active="active" ng-switch-when="true">
+                            <a ui-sref="oauthapp" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-plus"></span>&nbsp;
+                                <span>Create Application</span>
                             </a>
                         </li>
                         <li ui-sref-active="active" ng-switch-when="true">

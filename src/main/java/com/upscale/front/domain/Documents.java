@@ -52,16 +52,16 @@ public class Documents extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	public Documents() {}
+    public Documents() {}
 
-public Documents(String documentType, String documentName, String documentId, String documentData,
-		byte[] documentImage){
-		this.documentType = documentType;
-		this.documentName = documentName;
-		this.documentId = documentId;
-		this.documentData = documentData;
-		this.documentImage = documentImage;
-}
+    public Documents(String documentType, String documentName, String documentId, String documentData,
+        byte[] documentImage){
+        this.documentType = documentType;
+        this.documentName = documentName;
+        this.documentId = documentId;
+        this.documentData = documentData;
+        this.documentImage = documentImage;
+    }
 
 	public Long getId() {
 		return id;
