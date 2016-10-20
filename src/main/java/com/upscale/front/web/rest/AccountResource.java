@@ -17,6 +17,7 @@ import com.upscale.front.web.rest.dto.ManagedUserDTO;
 import com.upscale.front.web.rest.dto.OauthClientDetailsDTO;
 import com.upscale.front.web.rest.dto.UserDTO;
 import com.upscale.front.web.rest.util.HeaderUtil;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -596,7 +598,11 @@ public class AccountResource {
 
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
 
-            OauthClientDetails oauthClientDetails = userService.createApplication(oauthClientDetailsDTO,u);
+            try {
+                OauthClientDetails oauthClientDetails = userService.createApplication(oauthClientDetailsDTO,u);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
 
             return new ResponseEntity<String>(HttpStatus.CREATED);
 
@@ -606,14 +612,14 @@ public class AccountResource {
 
     @RequestMapping(value = "/account/apps", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> retriveAllApps() {
+    public ResponseEntity<List<OauthData>> retriveAllApps() {
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).map(u ->{
 
-            OauthData oauthData = userService.retrieveApplications(u);
+            List<OauthData> oauthData = userService.retrieveApplications(u);
 
-            return new ResponseEntity<OauthData>(oauthData, HttpStatus.FOUND);
+            return new ResponseEntity<List<OauthData>>(oauthData, HttpStatus.FOUND);
 
-        }).orElse(new ResponseEntity<OauthData>(HttpStatus.INTERNAL_SERVER_ERROR));
+        }).orElse(new ResponseEntity<List<OauthData>>(HttpStatus.INTERNAL_SERVER_ERROR));
 
     }
 

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,8 +20,10 @@ public interface OauthClientRepository extends JpaRepository<OauthClientDetails,
 
     public final Logger log = LoggerFactory.getLogger(OauthClientRepository.class);
 
-    Optional<OauthClientDetails> findAllByUser(User u);
+    Optional<List<OauthClientDetails>> findAllByUser(User u);
 
     Optional<OauthClientDetails> findOneByApplicationnameAndUser(String applicationname, User userId);
+
+    //Optional<List<OauthClientDetails>> findByApplicationnameAndUser(String applicationname, User userId);
 
 }

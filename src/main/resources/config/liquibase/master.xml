@@ -14,13 +14,8 @@
     <include file="classpath:config/liquibase/changelog/20160814092405_changelog.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160817183539_changelog.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160811073413_changelog.xml" relativeToChangelogFile="false"/>
-<<<<<<< HEAD
-    <include file="classpath:config/liquibase/changelog/20161010140812_changelog.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/20161010182736_changelog.xml" relativeToChangelogFile="false"/>
-=======
     <include file="classpath:config/liquibase/changelog/20161014113317_changelog.xml" relativeToChangelogFile="false"/>
 
->>>>>>> 4f19098d4debcac12952e4b70bb7bd294e16b3d6
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
 
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->

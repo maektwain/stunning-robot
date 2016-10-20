@@ -16,6 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -129,23 +130,23 @@ public class UserServiceIntTest {
 
 
     @Test
-    public void testApplicationCreationByUser() {
+    public void testApplicationCreationByUser() throws NoSuchAlgorithmException {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
         OauthClientDetailsDTO oauthClientDetailsDTO = new OauthClientDetailsDTO("Test Application", "This application is for testing purpose only", "https://theupscale.co.in/test");
         assertThat(userService.createApplication(oauthClientDetailsDTO, user)).isNotNull();
     }
 
     @Test
-    public void testToRetrieveApplicationOauthToken() {
+    public void testToRetrieveApplicationOauthToken() throws NoSuchAlgorithmException {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
         OauthClientDetailsDTO oauthClientDetailsDTO = new OauthClientDetailsDTO("Test Application", "This application is for testing purpose only", "https://theupscale.co.in/test");
         userService.createApplication(oauthClientDetailsDTO, user);
-        OauthData oauthData = userService.retrieveApplications(user);
+        List<OauthData> oauthData = userService.retrieveApplications(user);
         assertThat(oauthData).isNotNull();
     }
 
     @Test
-    public void testToDeleteApplication() {
+    public void testToDeleteApplication() throws NoSuchAlgorithmException {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost","9899318697", "en-US");
         OauthClientDetailsDTO oauthClientDetailsDTO = new OauthClientDetailsDTO("Test Application", "This application is for testing purpose only", "https://theupscale.co.in/test");
         userService.createApplication(oauthClientDetailsDTO, user);
