@@ -5,9 +5,9 @@
         .module('frontendApp')
         .controller('OauthAppController', OauthAppController);
 
-    OauthAppController.$inject = ['$inject', '$state', 'OauthApps', 'AlertService' ];
+    OauthAppController.$inject = ['$scope', '$state', 'OauthApps', 'AlertService' ];
 
-    function OauthAppController ($scope, $state, OauthAppController,AlertService) {
+    function OauthAppController ($scope, $state, OauthApps,AlertService) {
 
         var vm = this;
 
@@ -17,7 +17,7 @@
 
         function loadAll () {
 
-            OauthApp.get({
+            OauthApps.get({
 
             }, onSuccess, onError);
 
@@ -33,4 +33,4 @@
     }
 
 
-})
+})();

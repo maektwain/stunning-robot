@@ -26,34 +26,31 @@
         })
         .state('oauthapp.new', {
             parent: 'account',
-            url: '/new',
+            url: '/apps/new',
             data: {
                 authorities: ['ROLE_USER']
             },
             onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                 $uibModal.open({
-                    templateUrl: 'app/account/oauthapp/oauthapp-dialog.html',
-                    controller: 'ProductsDialogController',
+                    templateUrl: 'app/account/oauthapp/oauth-dialog.html',
+                    controller: 'OauthAppDialogController',
                     controllerAs: 'vm',
                     backdrop: 'static',
                     size: 'lg',
                     resolve: {
                         entity: function () {
                             return {
-                                name: null,
-                                price: null,
-                                brand: null,
-                                model: null,
-                                imageUrl: null,
-                                description: null,
+                                applicationname: null,
+                                callbackurl: null,
+                                applicationdescription: null,
                                 id: null
                             };
                         }
                     }
                 }).result.then(function() {
-                    $state.go('products', null, { reload: true });
+                    $state.go('oauthapp', null, { reload: true });
                 }, function() {
-                    $state.go('products');
+                    $state.go('oauthapp');
                 });
             }]
         })
@@ -82,7 +79,7 @@
                 });
             }]
         })
-        .state('products.delete', {
+        .state('oauthapp.delete', {
             parent: 'products',
             url: '/{id}/delete',
             data: {
